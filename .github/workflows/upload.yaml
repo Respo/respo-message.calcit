@@ -1,4 +1,4 @@
-name: Tests
+name: Upload
 
 on:
   push:
@@ -19,21 +19,16 @@ jobs:
     - name: "prepare modules"
       run: >
         mkdir -p ~/.config/calcit/modules/ && cd ~/.config/calcit/modules/
-        && git clone https://github.com/calcit-lang/memof.git
         && git clone https://github.com/calcit-lang/lilac.git
-        && git clone https://github.com/calcit-lang/calcit-test.git
+        && git clone https://github.com/calcit-lang/memof.git
+        && git clone https://github.com/Respo/respo.calcit.git
+        && git clone https://github.com/Respo/respo-ui.calcit.git
+        && git clone https://github.com/Cumulo/cumulo-util.calcit.git
 
-    - name: "load deps"
+    - name: "compiles to js"
       run: >
-        ci-bin/cr_once --emit-js
-        && yarn
-
-    - name: "test js"
-      run: target=node yarn webpack && env=ci node js-out/bundle.js
-
-    - name: "build js"
-      run: >
-        yarn vite build --base=./
+        ./ci-bin/cr_once --emit-js --once
+        && yarn && yarn vite build --base=./
 
     - name: Deploy to server
       id: deploy
