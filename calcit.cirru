@@ -1593,7 +1593,12 @@
                       |r $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1614325430129) (:text |0)
         :proc $ {} (:type :expr) (:by |root) (:at 1528522309643) (:id |HJmRHI1txQ)
           :data $ {}
-  :configs $ {} (:storage-key |calcit.cirru) (:extension |.cljs) (:output |src) (:port 6001) (:compact-output? true)
+  :configs $ {} (:reload-fn |respo-message.main/reload!)
     :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/ |cumulo-util.calcit/
+    :output |src
+    :port 6001
+    :extension |.cljs
     :init-fn |respo-message.main/main!
-    :reload-fn |respo-message.main/reload!
+    :compact-output? true
+    :storage-key |calcit.cirru
+    :version |0.0.1

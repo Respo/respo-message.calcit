@@ -2,7 +2,7 @@
 {} (:package |respo-message)
   :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!)
     :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/ |cumulo-util.calcit/
-    :version nil
+    :version |0.0.1
   :files $ {}
     |respo-message.main $ {}
       :ns $ quote
