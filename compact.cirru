@@ -2,7 +2,7 @@
 {} (:package |respo-message)
   :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!)
     :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/ |cumulo-util.calcit/
-    :version |0.0.1
+    :version |0.0.2
   :files $ {}
     |respo-message.main $ {}
       :ns $ quote
@@ -72,9 +72,10 @@
             list->
               {} $ :style
                 {} $ :overflow :hidden
-              ->>
-                either messages $ {}
-                , vals (set->list)
+              -> messages
+                either $ {}
+                vals
+                set->list
                 sort $ fn (message m)
                   - (:time m) (:time message)
                 map-indexed $ fn (idx message)
@@ -140,7 +141,7 @@
               (= op action/remove-one)
                 if
                   some? $ :token op-data
-                  ->> messages (to-pairs)
+                  -> messages (to-pairs)
                     filter $ fn (pair)
                       let[] (k message) pair $ not= (:token op-data) (:token message)
                     pairs-map
@@ -211,7 +212,7 @@
                 <> (:text message) nil
         |effect-fade $ quote
           defeffect effect-fade (message) (action el *local)
-            case-default action (do)
+            case-default action nil
               :mount $ let
                   style $ .-style el
                 set! (.-right style) "\"60px"

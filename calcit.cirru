@@ -432,15 +432,16 @@
                                   |j $ {} (:type :leaf) (:by |root) (:at 1528440298031) (:text |:hidden) (:id |HJbx8jvl7)
                   |r $ {} (:type :expr) (:id |ByT2-TQ552Jz) (:by nil) (:at 1510939172486)
                     :data $ {}
-                      |T $ {} (:type :leaf) (:id |HJR3WT759nyM) (:text |->>) (:by |root) (:at 1510939172486)
+                      |T $ {} (:type :leaf) (:id |HJR3WT759nyM) (:text |->) (:by |5tTrKalIE) (:at 1619591838170)
                       |j $ {} (:type :expr) (:by |5tTrKalIE) (:at 1614325573692)
                         :data $ {}
-                          |T $ {} (:type :leaf) (:id |B1JpbaQqqhJG) (:text |messages) (:by |root) (:at 1528392415293)
                           |D $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1614325584140) (:text |either)
                           |j $ {} (:type :expr) (:by |5tTrKalIE) (:at 1614325575884)
                             :data $ {}
                               |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1614325576417) (:text |{})
-                      |n $ {} (:type :leaf) (:by |root) (:at 1528391863867) (:text |vals) (:id |HJbJ6_kveX)
+                      |n $ {} (:type :expr) (:by |5tTrKalIE) (:at 1619591842799)
+                        :data $ {}
+                          |T $ {} (:type :leaf) (:by |root) (:at 1528391863867) (:text |vals) (:id |HJbJ6_kveX)
                       |o $ {} (:type :expr) (:by |root) (:at 1528526572242) (:id |B1lVewxFlm)
                         :data $ {}
                           |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1614324735501) (:text |sort) (:id |ByVlvetx7)
@@ -489,6 +490,7 @@
                       |nT $ {} (:type :expr) (:by |5tTrKalIE) (:at 1614325223625)
                         :data $ {}
                           |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1614325226875) (:text |set->list)
+                      |b $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1619591841777) (:text |messages)
         :proc $ {} (:type :expr) (:id |SJDjbp7cqhJz) (:by nil) (:at 1510939172486)
           :data $ {}
       |respo-message.comp.container $ {}
@@ -866,7 +868,7 @@
                                   |j $ {} (:type :leaf) (:by |root) (:at 1528911489624) (:text |op-data) (:id |Sy-ttIARlQ)
                           |P $ {} (:type :expr) (:by |root) (:at 1528911490784) (:id |SJsK8A0eX)
                             :data $ {}
-                              |T $ {} (:type :leaf) (:by |root) (:at 1528911499863) (:text |->>) (:id |SJsK8A0eXleaf)
+                              |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1619591867949) (:text |->) (:id |SJsK8A0eXleaf)
                               |j $ {} (:type :leaf) (:by |root) (:at 1528911501964) (:text |messages) (:id |ByWEc8CAgm)
                               |n $ {} (:type :expr) (:by |root) (:at 1528911507933) (:id |Bkg29UACx7)
                                 :data $ {}
@@ -1406,9 +1408,7 @@
                                     :data $ {}
                                       |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1572679957757) (:text |.remove) (:id |X1-pO8pkSleaf)
                                       |j $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1572679959725) (:text |cloned) (:id |vFLoZPW3K3)
-                  |n $ {} (:type :expr) (:by |5tTrKalIE) (:at 1614324826612)
-                    :data $ {}
-                      |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1614324827014) (:text |do)
+                  |n $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1619591569274) (:text |nil)
           |style-message $ {} (:type :expr) (:id |BksrW6Qcqh1z) (:by nil) (:at 1510939172486)
             :data $ {}
               |T $ {} (:type :leaf) (:id |SknS-aXqcnkG) (:text |def) (:by |root) (:at 1510939172486)
@@ -1601,4 +1601,4 @@
     :init-fn |respo-message.main/main!
     :compact-output? true
     :storage-key |calcit.cirru
-    :version |0.0.1
+    :version |0.0.2
