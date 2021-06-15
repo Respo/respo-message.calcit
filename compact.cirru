@@ -2,7 +2,7 @@
 {} (:package |respo-message)
   :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!)
     :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/ |cumulo-util.calcit/
-    :version |0.0.2
+    :version |0.0.3
   :files $ {}
     |respo-message.main $ {}
       :ns $ quote
@@ -75,7 +75,7 @@
               -> messages
                 either $ {}
                 vals
-                set->list
+                .to-list
                 sort $ fn (message m)
                   - (:time m) (:time message)
                 map-indexed $ fn (idx message)

@@ -489,7 +489,7 @@
                                       |x $ {} (:type :leaf) (:by |root) (:at 1529229285752) (:text |on-remove!) (:id |HJlTyxnQWm)
                       |nT $ {} (:type :expr) (:by |5tTrKalIE) (:at 1614325223625)
                         :data $ {}
-                          |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1614325226875) (:text |set->list)
+                          |T $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1623719730432) (:text |.to-list)
                       |b $ {} (:type :leaf) (:by |5tTrKalIE) (:at 1619591841777) (:text |messages)
         :proc $ {} (:type :expr) (:id |SJDjbp7cqhJz) (:by nil) (:at 1510939172486)
           :data $ {}
@@ -1601,4 +1601,4 @@
     :init-fn |respo-message.main/main!
     :compact-output? true
     :storage-key |calcit.cirru
-    :version |0.0.2
+    :version |0.0.3
