@@ -1,34 +1,45 @@
 
 {} (:package |respo-message)
   :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!)
-    :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/ |cumulo-util.calcit/
-    :version |0.0.3
+    :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/
+    :version |0.0.4-a1
+  :entries $ {}
   :files $ {}
     |respo-message.main $ {}
       :ns $ quote
         ns respo-message.main $ :require
-          [] respo.core :refer $ [] render! clear-cache! realize-ssr!
-          [] respo.cursor :refer $ [] update-states
-          [] respo.util.format :refer $ [] mute-element
-          [] respo-message.comp.container :refer $ [] comp-container
-          [] cljs.reader :refer $ [] read-string
-          [] respo-message.schema :as schema
-          [] "\"lorem-ipsum" :as lorem-ipsum
-          [] "\"shortid" :as shortid
-          [] respo-message.updater :refer $ [] update-messages
-          [] respo-message.action :as action
-          [] respo-message.config :as config
+          respo.core :refer $ render! clear-cache!
+          respo.cursor :refer $ update-states
+          respo.util.format :refer $ mute-element
+          respo-message.comp.container :refer $ comp-container
+          respo-message.schema :as schema
+          "\"lorem-ipsum" :as lorem-ipsum
+          respo-message.updater :refer $ update-messages
+          respo-message.action :as action
+          respo-message.config :as config
       :defs $ {}
-        |ssr? $ quote
-          def ssr? $ some? (.querySelector js/document |meta.respo-app)
-        |id! $ quote
-          defn id! () (swap! *id inc) @*id
+        |render-app! $ quote
+          defn render-app! (renderer)
+            renderer mount-target (comp-container @*store)
+              fn (x y) (dispatch! x y)
+        |mount-target $ quote
+          def mount-target $ js/document.querySelector |.app
+        |main! $ quote
+          defn main! ()
+            println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
+            render-app! render!
+            add-watch *store :changes $ fn (store prev) (render-app! render!)
+            js/setTimeout $ fn ()
+              dispatch! action/create $ {}
+                :text $ lorem-ipsum/loremIpsum
+            println "|app started!"
+        |*store $ quote (defatom *store schema/store)
         |dispatch! $ quote
           defn dispatch! (op op-data)
             when config/dev? $ println "\"Dispatch:" op
             let
-                op-id $ shortid/generate
-                op-time $ .now js/Date
+                op-id $ generate-id!
+                op-time $ js/Date.now
                 store @*store
               reset! *store $ cond
                   = op :states
@@ -36,36 +47,15 @@
                 (action/message-action? op)
                   update store :messages $ fn (x) (update-messages x op op-data op-id op-time)
                 true $ do (println "\"Unhandled operation:" op) store
-        |*store $ quote (defatom *store schema/store)
-        |main! $ quote
-          defn main! ()
-            println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
-            if ssr? $ render-app! realize-ssr!
-            render-app! render!
-            add-watch *store :changes $ fn (store prev) (render-app! render!)
-            js/setTimeout $ fn ()
-              dispatch! action/create $ {}
-                :text $ lorem-ipsum/loremIpsum
-            println "|app started!"
-        |*states $ quote
-          defatom *states $ {}
-        |render-app! $ quote
-          defn render-app! (renderer)
-            renderer mount-target (comp-container @*store)
-              fn (x y) (dispatch! x y)
         |reload! $ quote
           defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
             dispatch! action/create $ {}
               :text $ lorem-ipsum/loremIpsum
-        |mount-target $ quote
-          def mount-target $ .querySelector js/document |.app
-        |*id $ quote (defatom *id 0)
-      :proc $ quote ()
     |respo-message.comp.messages $ {}
       :ns $ quote
         ns respo-message.comp.messages $ :require
-          [] respo.core :refer $ [] defcomp list-> div span <>
-          [] respo-message.comp.message :refer $ [] comp-message
+          respo.core :refer $ defcomp list-> div span <>
+          respo-message.comp.message :refer $ comp-message
       :defs $ {}
         |comp-messages $ quote
           defcomp comp-messages (messages options on-remove!)
@@ -80,21 +70,19 @@
                   - (:time m) (:time message)
                 map-indexed $ fn (idx message)
                   [] (:id message) (comp-message idx message options on-remove!)
-      :proc $ quote ()
     |respo-message.comp.container $ {}
       :ns $ quote
         ns respo-message.comp.container $ :require
-          [] hsl.core :refer $ [] hsl
-          [] respo.core :refer $ [] defcomp div span button <>
-          [] respo-ui.core :as ui
-          [] respo.comp.space :refer $ [] =<
-          [] respo-message.comp.messages :refer $ [] comp-messages
-          [] respo-message.schema :as schema
-          [] "\"lorem-ipsum" :as lorem-ipsum
-          [] respo-message.action :as action
-          [] respo.comp.inspect :refer $ [] comp-inspect
-          [] respo-message.config :as config
-          [] "\"shortid" :as shortid
+          hsl.core :refer $ hsl
+          respo.core :refer $ defcomp div span button <>
+          respo-ui.core :as ui
+          respo.comp.space :refer $ =<
+          respo-message.comp.messages :refer $ comp-messages
+          respo-message.schema :as schema
+          "\"lorem-ipsum" :as lorem-ipsum
+          respo-message.action :as action
+          respo.comp.inspect :refer $ comp-inspect
+          respo-message.config :as config
       :defs $ {}
         |comp-container $ quote
           defcomp comp-container (store)
@@ -107,7 +95,7 @@
                   {} (:style ui/button)
                     :on-click $ fn (e d!)
                       let
-                          new-token $ shortid/generate
+                          new-token $ generate-id!
                         d! action/create $ merge schema/message
                           {} (:token new-token)
                             :text $ lorem-ipsum/loremIpsum
@@ -125,10 +113,9 @@
                 {} $ :bottom? true
                 fn (info d!) (d! action/remove-one info)
               when config/dev? $ comp-inspect "\"messages" (:messages store) nil
-      :proc $ quote ()
     |respo-message.updater $ {}
       :ns $ quote
-        ns respo-message.updater $ :require ([] respo-message.schema :as schema) ([] respo-message.action :as action)
+        ns respo-message.updater $ :require (respo-message.schema :as schema) (respo-message.action :as action)
       :defs $ {}
         |update-messages $ quote
           defn update-messages (messages op op-data op-id op-time)
@@ -147,7 +134,6 @@
                     pairs-map
                   dissoc messages $ :id op-data
               true messages
-      :proc $ quote ()
     |respo-message.schema $ {}
       :ns $ quote (ns respo-message.schema)
       :defs $ {}
@@ -158,7 +144,6 @@
           def store $ {}
             :messages $ {}
             :states $ {}
-      :proc $ quote ()
     |respo-message.config $ {}
       :ns $ quote (ns respo-message.config)
       :defs $ {}
@@ -178,15 +163,13 @@
               :else true
         |site $ quote
           def site $ {} (:dev-ui "\"http://localhost:8100/main-fonts.css") (:release-ui "\"http://cdn.tiye.me/favored-fonts/main-fonts.css") (:cdn-url "\"http://cdn.tiye.me/respo-message/") (:title "\"Message") (:icon "\"http://cdn.tiye.me/logo/respo.png") (:storage-key "\"respo-message")
-      :proc $ quote ()
     |respo-message.comp.message $ {}
       :ns $ quote
         ns respo-message.comp.message $ :require
-          [] respo.core :refer $ [] defcomp div <> span defeffect
-          [] respo-ui.core :as ui
-          [] respo.util.format :refer $ [] hsl
-          [] respo-message.schema :as schema
-          [] cumulo-util.core :refer $ [] delay!
+          respo.core :refer $ defcomp div <> span defeffect
+          respo-ui.core :as ui
+          respo.util.format :refer $ hsl
+          respo-message.schema :as schema
       :defs $ {}
         |comp-message $ quote
           defcomp comp-message (idx message options on-remove!)
@@ -217,17 +200,23 @@
                   style $ .-style el
                 set! (.-right style) "\"60px"
                 set! (.-opacity style) "\"0"
-                delay! 0.01 $ fn ()
-                  set! (.-right style) "\"8px"
-                  set! (.-opacity style) "\"1"
+                js/setTimeout
+                  fn ()
+                    set! (.-right style) "\"8px"
+                    set! (.-opacity style) "\"1"
+                  , 100
               :unmount $ let
-                  cloned $ .cloneNode el true
+                  cloned $ .!cloneNode el true
                   style $ .-style cloned
-                .appendChild (.-parentElement el) cloned
-                delay! 0.01 $ fn ()
-                  set! (.-right style) "\"60px"
-                  set! (.-opacity style) "\"0"
-                delay! 0.3 $ fn () (.remove cloned)
+                .!appendChild (.-parentElement el) cloned
+                js/setTimeout
+                  fn ()
+                    set! (.-right style) "\"60px"
+                    set! (.-opacity style) "\"0"
+                  , 100
+                js/setTimeout
+                  fn () $ .!remove cloned
+                  , 300
         |style-message $ quote
           def style-message $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size |14)
             :background-color $ hsl 0 0 100
@@ -244,7 +233,6 @@
             :max-width 320
             :cursor :pointer
             :transition-duration |300ms
-      :proc $ quote ()
     |respo-message.action $ {}
       :ns $ quote (ns respo-message.action)
       :defs $ {}
@@ -262,4 +250,3 @@
         |gen-keyword $ quote
           defn gen-keyword (x)
             turn-keyword $ str x "\"_GEN_" 0
-      :proc $ quote ()

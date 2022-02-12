@@ -45,7 +45,7 @@ Sorry but the component gets even harder to setup:
 ```cirru
 defn dispatch! (op op-data)
   let
-      op-id (.generate shortid)
+      op-id (generate-id!)
       op-time (js/Date.now)
       store @*store
     reset! *store $ cond

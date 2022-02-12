@@ -1,11 +1,10 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.4-a1",
   "dependencies": {
-    "@calcit/procs": "^0.4.0-a3",
-    "shortid": "^2.2.16"
+    "@calcit/procs": "^0.5.17-a1"
   },
   "devDependencies": {
-    "lorem-ipsum": "^2.0.3",
-    "vite": "^2.3.7"
+    "lorem-ipsum": "^2.0.4",
+    "vite": "^2.8.1"
   }
 }
