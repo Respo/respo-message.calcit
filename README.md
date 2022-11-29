@@ -56,7 +56,6 @@ defn dispatch! (op op-data)
       true $ do (println "|Unhandled operation:" op) store
 ```
 
-
 ### License
 
 MIT
