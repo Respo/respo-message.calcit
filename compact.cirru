@@ -7,19 +7,19 @@
     |respo-message.action $ {}
       :defs $ {}
         |clear $ quote
-          def clear $ gen-keyword "\"message/clear"
+          def clear $ gen-tag "\"message/clear"
         |create $ quote
-          def create $ gen-keyword "\"message/create"
+          def create $ gen-tag "\"message/create"
         |dict $ quote
           def dict $ {} (:create create) (:remove-one remove-one) (:clear clear)
-        |gen-keyword $ quote
-          defn gen-keyword (x)
-            turn-keyword $ str x "\"_GEN_" 0
+        |gen-tag $ quote
+          defn gen-tag (x)
+            turn-tag $ str x "\"_GEN_" 0
         |message-action? $ quote
           defn message-action? (op)
             includes? (#{} clear create remove-one) op
         |remove-one $ quote
-          def remove-one $ gen-keyword "\"message/remove-one"
+          def remove-one $ gen-tag "\"message/remove-one"
       :ns $ quote (ns respo-message.action)
     |respo-message.comp.container $ {}
       :defs $ {}
