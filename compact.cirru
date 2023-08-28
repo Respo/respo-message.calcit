@@ -1,43 +1,36 @@
 
 {} (:package |respo-message)
-  :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!) (:version |0.0.6)
+  :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!) (:version |0.0.7)
     :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/
   :entries $ {}
   :files $ {}
-    |respo-message.action $ {}
+    |respo-message.action $ %{} :FileEntry
       :defs $ {}
-        |clear $ %{} :CodeEntry
+        |clear $ %{} :CodeEntry (:doc |)
           :code $ quote
             def clear $ gen-tag "\"message/clear"
-          :doc |
-        |create $ %{} :CodeEntry
+        |create $ %{} :CodeEntry (:doc |)
           :code $ quote
             def create $ gen-tag "\"message/create"
-          :doc |
-        |dict $ %{} :CodeEntry
+        |dict $ %{} :CodeEntry (:doc |)
           :code $ quote
             def dict $ {} (:create create) (:remove-one remove-one) (:clear clear)
-          :doc |
-        |gen-tag $ %{} :CodeEntry
+        |gen-tag $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn gen-tag (x)
               turn-tag $ str x "\"_GEN_" 0
-          :doc |
-        |message-action? $ %{} :CodeEntry
+        |message-action? $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn message-action? (op)
               includes? (#{} clear create remove-one) op
-          :doc |
-        |remove-one $ %{} :CodeEntry
+        |remove-one $ %{} :CodeEntry (:doc |)
           :code $ quote
             def remove-one $ gen-tag "\"message/remove-one"
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote (ns respo-message.action)
-        :doc |
-    |respo-message.comp.container $ {}
+    |respo-message.comp.container $ %{} :FileEntry
       :defs $ {}
-        |comp-container $ %{} :CodeEntry
+        |comp-container $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-container (store)
               div
@@ -67,8 +60,7 @@
                   {} $ :bottom? true
                   fn (info d!) (d! action/remove-one info)
                 when config/dev? $ comp-inspect "\"messages" (:messages store) nil
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-message.comp.container $ :require
             hsl.core :refer $ hsl
@@ -81,10 +73,9 @@
             respo-message.action :as action
             respo.comp.inspect :refer $ comp-inspect
             respo-message.config :as config
-        :doc |
-    |respo-message.comp.message $ {}
+    |respo-message.comp.message $ %{} :FileEntry
       :defs $ {}
-        |comp-message $ %{} :CodeEntry
+        |comp-message $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-message (idx message options on-remove!)
               [] (effect-fade message)
@@ -107,8 +98,7 @@
                           :time $ :time message
                         , d!
                   <> (:text message) nil
-          :doc |
-        |css-message $ %{} :CodeEntry
+        |css-message $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-message $ {}
               "\"$0" $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size |14)
@@ -127,8 +117,7 @@
                 :cursor :pointer
                 :transition-duration |400ms
                 :box-shadow $ str "\"0px 0px 4px " (hsl 0 0 10 0.1)
-          :doc |
-        |effect-fade $ %{} :CodeEntry
+        |effect-fade $ %{} :CodeEntry (:doc |)
           :code $ quote
             defeffect effect-fade (message) (action el *local)
               case-default action nil
@@ -154,8 +143,7 @@
                   js/setTimeout
                     fn () $ .!remove cloned
                     , 400
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-message.comp.message $ :require
             respo.core :refer $ defcomp div <> span defeffect
@@ -163,10 +151,9 @@
             respo.util.format :refer $ hsl
             respo-message.schema :as schema
             respo.css :refer $ defstyle
-        :doc |
-    |respo-message.comp.messages $ {}
+    |respo-message.comp.messages $ %{} :FileEntry
       :defs $ {}
-        |comp-messages $ %{} :CodeEntry
+        |comp-messages $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-messages (messages options on-remove!)
               list->
@@ -180,24 +167,21 @@
                     - (:time m) (:time message)
                   map-indexed $ fn (idx message)
                     [] (:id message) (comp-message idx message options on-remove!)
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-message.comp.messages $ :require
             respo.core :refer $ defcomp list-> div span <>
             respo-message.comp.message :refer $ comp-message
-        :doc |
-    |respo-message.config $ {}
+    |respo-message.config $ %{} :FileEntry
       :defs $ {}
-        |cdn? $ %{} :CodeEntry
+        |cdn? $ %{} :CodeEntry (:doc |)
           :code $ quote
             def cdn? $ cond
                 exists? js/window
                 , false
               (exists? js/process) (= "\"true" js/process.env.cdn)
               true false
-          :doc |
-        |dev? $ %{} :CodeEntry
+        |dev? $ %{} :CodeEntry (:doc |)
           :code $ quote
             def dev? $ let
                 debug? false
@@ -206,20 +190,16 @@
                   , debug?
                 (exists? js/process) (not= "\"true" js/process.env.release)
                 :else true
-          :doc |
-        |site $ %{} :CodeEntry
+        |site $ %{} :CodeEntry (:doc |)
           :code $ quote
             def site $ {} (:dev-ui "\"http://localhost:8100/main-fonts.css") (:release-ui "\"http://cdn.tiye.me/favored-fonts/main-fonts.css") (:cdn-url "\"http://cdn.tiye.me/respo-message/") (:title "\"Message") (:icon "\"http://cdn.tiye.me/logo/respo.png") (:storage-key "\"respo-message")
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote (ns respo-message.config)
-        :doc |
-    |respo-message.main $ {}
+    |respo-message.main $ %{} :FileEntry
       :defs $ {}
-        |*store $ %{} :CodeEntry
+        |*store $ %{} :CodeEntry (:doc |)
           :code $ quote (defatom *store schema/store)
-          :doc |
-        |dispatch! $ %{} :CodeEntry
+        |dispatch! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn dispatch! (op)
               when config/dev? $ println "\"Dispatch:" op
@@ -235,8 +215,7 @@
                       :states cursor s
                       update-states store cursor s
                     _ $ do (eprintln "\"Unhandled operation:" op) store
-          :doc |
-        |main! $ %{} :CodeEntry
+        |main! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn main! ()
               println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
@@ -246,23 +225,19 @@
                 dispatch! $ :: action/create
                   {} $ :text (lorem-ipsum/loremIpsum)
               println "|app started!"
-          :doc |
-        |mount-target $ %{} :CodeEntry
+        |mount-target $ %{} :CodeEntry (:doc |)
           :code $ quote
             def mount-target $ js/document.querySelector |.app
-          :doc |
-        |reload! $ %{} :CodeEntry
+        |reload! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
               dispatch! $ :: action/create
                 {} $ :text (lorem-ipsum/loremIpsum)
-          :doc |
-        |render-app! $ %{} :CodeEntry
+        |render-app! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn render-app! (renderer)
               renderer mount-target (comp-container @*store) dispatch!
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-message.main $ :require
             respo.core :refer $ render! clear-cache!
@@ -274,26 +249,22 @@
             respo-message.updater :refer $ update-messages
             respo-message.action :as action
             respo-message.config :as config
-        :doc |
-    |respo-message.schema $ {}
+    |respo-message.schema $ %{} :FileEntry
       :defs $ {}
-        |message $ %{} :CodeEntry
+        |message $ %{} :CodeEntry (:doc |)
           :code $ quote
             def message $ {} (:id nil) (:token nil) (:text "\"") (:time 0)
               :style $ {}
-          :doc |
-        |store $ %{} :CodeEntry
+        |store $ %{} :CodeEntry (:doc |)
           :code $ quote
             def store $ {}
               :messages $ {}
               :states $ {}
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote (ns respo-message.schema)
-        :doc |
-    |respo-message.updater $ {}
+    |respo-message.updater $ %{} :FileEntry
       :defs $ {}
-        |update-messages $ %{} :CodeEntry
+        |update-messages $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn update-messages (messages op op-data op-id op-time)
               cond
@@ -311,8 +282,6 @@
                       pairs-map
                     dissoc messages $ :id op-data
                 true messages
-          :doc |
-      :ns $ %{} :CodeEntry
+      :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-message.updater $ :require (respo-message.schema :as schema) (respo-message.action :as action)
-        :doc |
