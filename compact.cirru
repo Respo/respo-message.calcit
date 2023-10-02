@@ -1,6 +1,6 @@
 
 {} (:package |respo-message)
-  :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!) (:version |0.0.7)
+  :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!) (:version |0.0.8)
     :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/
   :entries $ {}
   :files $ {}
@@ -34,12 +34,13 @@
           :code $ quote
             defcomp comp-container (store)
               div
-                {} $ :style
-                  merge ui/global ui/fullscreen $ {} (:padding 16)
+                {}
+                  :class-name $ str-spaced css/global css/fullscreen
+                  :style $ {} (:padding 16)
                 div
-                  {} $ :style ui/row
+                  {} $ :class-name css/row
                   button
-                    {} (:style ui/button)
+                    {} (:class-name css/button)
                       :on-click $ fn (e d!)
                         let
                             new-token $ generate-id!
@@ -53,17 +54,18 @@
                     <> |Try
                   =< 16 nil
                   button
-                    {} (:style ui/button)
+                    {} (:class-name css/button)
                       :on-click $ fn (e d!) (d! action/clear nil)
                     <> "\"Clear"
                 comp-messages (:messages store)
-                  {} $ :bottom? true
+                  {} $ :bottom? false
                   fn (info d!) (d! action/remove-one info)
                 when config/dev? $ comp-inspect "\"messages" (:messages store) nil
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-message.comp.container $ :require
             hsl.core :refer $ hsl
+            respo-ui.css :as css
             respo.core :refer $ defcomp div span button <>
             respo-ui.core :as ui
             respo.comp.space :refer $ =<
@@ -78,30 +80,32 @@
         |comp-message $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-message (idx message options on-remove!)
-              [] (effect-fade message)
-                div
-                  {} (:class-name css-message)
-                    :style $ merge (:style message)
-                      if (:bottom? options)
-                        {} $ :bottom
-                          str
-                            + 8 $ * idx 40
-                            , "\"px"
-                        {} (:top 8)
-                          :transform $ str "|translate(0," (* idx 40) "|px)"
-                    :on-click $ fn (e d!)
-                      on-remove!
-                        {}
-                          :id $ :id message
-                          :token $ :token message
-                          :index idx
-                          :time $ :time message
-                        , d!
-                  <> (:text message) nil
+              let
+                  bottom? $ :bottom? options
+                [] (effect-fade message idx bottom?)
+                  div
+                    {} (:class-name css-message)
+                      :style $ merge (:style message)
+                        if bottom?
+                          {} $ :bottom
+                            str
+                              + 8 $ * idx 40
+                              , "\"px"
+                          {} (:top 8)
+                            :transform $ str "|translate(0," (* idx 40) "|px)"
+                      :on-click $ fn (e d!)
+                        on-remove!
+                          {}
+                            :id $ :id message
+                            :token $ :token message
+                            :index idx
+                            :time $ :time message
+                          , d!
+                    <> (:text message) nil
         |css-message $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-message $ {}
-              "\"$0" $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size |14)
+              "\"$0" $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size 14)
                 :background-color $ hsl 0 0 100
                 :border-style :solid
                 :border-width "\"1px"
@@ -119,30 +123,32 @@
                 :box-shadow $ str "\"0px 0px 4px " (hsl 0 0 10 0.1)
         |effect-fade $ %{} :CodeEntry (:doc |)
           :code $ quote
-            defeffect effect-fade (message) (action el *local)
-              case-default action nil
-                :mount $ let
-                    style $ .-style el
-                  set! (.-transform style) "\"translate(60px,0px)"
-                  set! (.-opacity style) "\"0"
-                  js/setTimeout
-                    fn ()
-                      set! (.-transform style) "\"translate(0px,0px)"
-                      set! (.-opacity style) "\"1"
-                      set! (.-zIndex style) "\"-1"
-                    , 10
-                :unmount $ let
-                    cloned $ .!cloneNode el true
-                    style $ .-style cloned
-                  .!appendChild (.-parentElement el) cloned
-                  js/setTimeout
-                    fn ()
-                      set! (.-transform style) "\"translate(60px,0px)"
-                      set! (.-opacity style) "\"0"
-                    , 10
-                  js/setTimeout
-                    fn () $ .!remove cloned
-                    , 400
+            defeffect effect-fade (message idx bottom?) (action el *local)
+              let
+                  dy $ if bottom? 0 (* idx 40)
+                case-default action nil
+                  :mount $ let
+                      style $ .-style el
+                    set! (.-transform style) (str "\"translate(60px," dy "\"px)")
+                    set! (.-opacity style) "\"0"
+                    js/setTimeout
+                      fn ()
+                        set! (.-transform style) (str "\"translate(0px," dy "\"px)")
+                        set! (.-opacity style) "\"1"
+                        set! (.-zIndex style) "\"-1"
+                      , 10
+                  :unmount $ let
+                      cloned $ .!cloneNode el true
+                      style $ .-style cloned
+                    .!appendChild (.-parentElement el) cloned
+                    js/setTimeout
+                      fn ()
+                        set! (.-transform style) (str "\"translate(60px," dy "\"px)")
+                        set! (.-opacity style) "\"0"
+                      , 10
+                    js/setTimeout
+                      fn () $ .!remove cloned
+                      , 400
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-message.comp.message $ :require
@@ -158,7 +164,9 @@
             defcomp comp-messages (messages options on-remove!)
               list->
                 {} $ :style
-                  {} (:position :fixed) (:bottom 0) (:right 0)
+                  if (:bottom? options)
+                    {} (:position :fixed) (:bottom 0) (:right 0)
+                    {} (:position :fixed) (:top 0) (:right 0)
                 -> messages
                   either $ {}
                   vals
