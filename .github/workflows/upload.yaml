@@ -22,9 +22,7 @@ jobs:
         corepack prepare yarn@4.12.0 --activate
         yarn --version
 
-    - uses: calcit-lang/setup-cr@0.0.8
-      with:
-        version: 0.12.14
+    - uses: calcit-lang/setup-cr@0.0.9
 
     - name: "compiles to js"
       run: >
