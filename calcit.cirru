@@ -1,57 +1,60 @@
 
-{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-message)
-  :configs $ {} (:init-fn |respo-message.main/main!) (:reload-fn |respo-message.main/reload!) (:version |0.0.10)
-    :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/
+{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-message) (:version |0.0.10)
   :entries $ {}
+    :default $ {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :native) (:reload-fn 'respo-message.main/reload!)
+      :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/
+      :type-slots $ {}
   :files $ {}
     |respo-message.action $ %{} :FileEntry
       :defs $ {}
-        |clear $ %{} :CodeEntry (:doc "|Action tag for clearing all messages. Use it with dispatch! to remove all displayed messages at once.") (:schema :dynamic)
+        |clear $ %{} :CodeEntry (:doc "|Action tag for clearing all messages. Use it with dispatch! to remove all displayed messages at once.")
           :code $ quote
             def clear $ gen-tag |message/clear
           :examples $ []
-            quote $ dispatch! action/clear nil
-        |create $ %{} :CodeEntry (:doc "|Action tag for creating a new message. Use it with dispatch! to display a toast message.") (:schema :dynamic)
+            quote $ assert= true (tag? respo-message.action/clear)
+            quote $ assert= true (respo-message.action/message-action? respo-message.action/clear)
+          :schema $ :: 'Dynamic
+        |create $ %{} :CodeEntry (:doc "|Action tag for creating a new message. Use it with dispatch! to display a toast message.")
           :code $ quote
             def create $ gen-tag |message/create
           :examples $ []
-            quote $ dispatch! action/create
-              {} (:text "|Hello world!") (:token |msg-1)
-            quote $ dispatch! action/create
-              {} (:text "|Operation completed")
-                :style $ {}
-                  :background-color $ hsl 120 80 60
-        |dict $ %{} :CodeEntry (:doc "|Dictionary of all message action tags. Useful for pattern matching and validation.") (:schema :dynamic)
+            quote $ assert= true (tag? respo-message.action/create)
+            quote $ assert= true (respo-message.action/message-action? respo-message.action/create)
+          :schema $ :: 'Dynamic
+        |dict $ %{} :CodeEntry (:doc "|Dictionary of all message action tags. Useful for pattern matching and validation.")
           :code $ quote
             def dict $ {} (:create create) (:remove-one remove-one) (:clear clear)
           :examples $ []
-            quote $ get action/dict :create
-            quote $ keys action/dict
-        |gen-tag $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+            quote $ assert= true
+              option:some? $ get respo-message.action/dict :create
+            quote $ assert= 3 (count respo-message.action/dict)
+          :schema $ :: 'Dynamic
+        |gen-tag $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn gen-tag (x)
               turn-tag $ str x |_GEN_ 0
           :examples $ []
-        |message-action? $ %{} :CodeEntry (:doc "|Predicate function to check if an operation is a message action. Returns true for create, clear, and remove-one actions.") (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |message-action? $ %{} :CodeEntry (:doc "|Predicate function to check if an operation is a message action. Returns true for create, clear, and remove-one actions.")
           :code $ quote
             defn message-action? (op)
               includes? (#{} clear create remove-one) op
           :examples $ []
-            quote $ action/message-action? action/create
-            quote $ action/message-action? :unknown-action
-        |remove-one $ %{} :CodeEntry (:doc "|Action tag for removing a specific message. Messages can be identified by :id or :token field.") (:schema :dynamic)
+            quote $ assert= true (respo-message.action/message-action? respo-message.action/create)
+            quote $ assert= false (respo-message.action/message-action? :unknown-action)
+          :schema $ :: 'Dynamic
+        |remove-one $ %{} :CodeEntry (:doc "|Action tag for removing a specific message. Messages can be identified by :id or :token field.")
           :code $ quote
             def remove-one $ gen-tag |message/remove-one
           :examples $ []
-            quote $ dispatch! action/remove-one
-              {} $ :token |msg-1
-            quote $ dispatch! action/remove-one
-              {} $ :id |some-id
+            quote $ assert= true (tag? respo-message.action/remove-one)
+            quote $ assert= true (respo-message.action/message-action? respo-message.action/remove-one)
+          :schema $ :: 'Dynamic
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote (ns respo-message.action)
     |respo-message.comp.container $ %{} :FileEntry
       :defs $ {}
-        |comp-container $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |comp-container $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-container (store)
               div
@@ -83,6 +86,7 @@
                   fn (info d!) (d! action/remove-one info)
                 when config/dev? $ comp-inspect |messages (:messages store) nil
           :examples $ []
+          :schema $ :: 'Dynamic
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.container $ :require
@@ -99,7 +103,7 @@
             respo-message.config :as config
     |respo-message.comp.message $ %{} :FileEntry
       :defs $ {}
-        |comp-message $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |comp-message $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-message (idx message options on-remove!)
               let
@@ -125,7 +129,8 @@
                           , d!
                     <> (:text message) nil
           :examples $ []
-        |css-message $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |css-message $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-message $ {}
               |$0 $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size 14)
@@ -145,6 +150,7 @@
                 :transition-duration |400ms
                 :box-shadow $ str "|0px 0px 4px " (hsl 0 0 10 0.1)
           :examples $ []
+          :schema $ :: 'Dynamic
         |effect-fade $ %{} :CodeEntry (:doc |)
           :code $ quote
             defeffect effect-fade (message idx bottom?) (action el *local)
@@ -152,7 +158,7 @@
                   dy $ if bottom? 0 (* idx 40)
                 case-default action nil
                   :mount $ let
-                      style $ .-style el
+                      style $ unsafe-coerce (.-style el) 'JsObject
                     set! (.-transform style) (str "|translate(60px," dy "|px)")
                     set! (.-opacity style) |0
                     js/setTimeout
@@ -162,9 +168,10 @@
                         set! (.-zIndex style) |-1
                       , 10
                   :unmount $ let
-                      cloned $ .!cloneNode el true
-                      style $ .-style cloned
-                    .!appendChild (.-parentElement el) cloned
+                      cloned $ unsafe-coerce (.!cloneNode el true) 'JsObject
+                      style $ unsafe-coerce (.-style cloned) 'JsObject
+                      parent $ unsafe-coerce (.-parentElement el) 'JsObject
+                    .!appendChild parent cloned
                     js/setTimeout
                       fn ()
                         set! (.-transform style) (str "|translate(60px," dy "|px)")
@@ -174,9 +181,9 @@
                       fn () $ .!remove cloned
                       , 400
           :examples $ []
-          :schema $ :: :fn
-            {} (:return :dynamic)
-              :args $ [] :dynamic :dynamic :dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Dynamic)
+              :args $ [] 'Dynamic 'Dynamic 'Dynamic
               :features $ #{} :js-ffi
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote
@@ -188,7 +195,7 @@
             respo.css :refer $ defstyle
     |respo-message.comp.messages $ %{} :FileEntry
       :defs $ {}
-        |comp-messages $ %{} :CodeEntry (:doc "|Respo component that renders a list of toast messages. Pass messages map, options (with :bottom? flag for positioning), and on-remove! callback. Messages are auto-sorted by time (newest first) and rendered at fixed position (top-right or bottom-right).") (:schema :dynamic)
+        |comp-messages $ %{} :CodeEntry (:doc "|Respo component that renders a list of toast messages. Pass messages map, options (with :bottom? flag for positioning), and on-remove! callback. Messages are auto-sorted by time (newest first) and rendered at fixed position (top-right or bottom-right).")
           :code $ quote
             defcomp comp-messages (messages options on-remove!)
               list->
@@ -205,12 +212,13 @@
                   map-indexed $ fn (idx message)
                     [] (:id message) (comp-message idx message options on-remove!)
           :examples $ []
-            quote $ comp-messages (:messages store)
+            quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? true
-              fn (info d!) (d! action/remove-one info)
-            quote $ comp-messages (:messages store)
+              fn (info) nil
+            quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? false
-              fn (info d!) (d! action/remove-one info)
+              fn (info) nil
+          :schema $ :: 'Dynamic
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.messages $ :require
@@ -218,7 +226,7 @@
             respo-message.comp.message :refer $ comp-message
     |respo-message.config $ %{} :FileEntry
       :defs $ {}
-        |cdn? $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |cdn? $ %{} :CodeEntry (:doc |)
           :code $ quote
             def cdn? $ cond
                 exists? js/window
@@ -226,6 +234,7 @@
               (exists? js/process) (= |true js/process.env.cdn)
               true false
           :examples $ []
+          :schema $ :: 'Dynamic
         |dev? $ %{} :CodeEntry (:doc |)
           :code $ quote
             def dev? $ let
@@ -234,24 +243,26 @@
                   exists? js/window
                   , debug?
                 (exists? js/process) (not= |true js/process.env.release)
-                :else true
+                true true
           :examples $ []
-          :schema $ :: :fn
-            {} (:return :dynamic)
+          :schema $ :: 'Fn
+            {} (:return 'Dynamic)
               :args $ []
               :features $ #{} :js-ffi
-        |site $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |site $ %{} :CodeEntry (:doc |)
           :code $ quote
             def site $ {} (:dev-ui |http://localhost:8100/main-fonts.css) (:release-ui |http://cdn.tiye.me/favored-fonts/main-fonts.css) (:cdn-url |http://cdn.tiye.me/respo-message/) (:title |Message) (:icon |http://cdn.tiye.me/logo/respo.png) (:storage-key |respo-message)
           :examples $ []
+          :schema $ :: 'Dynamic
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote (ns respo-message.config)
     |respo-message.main $ %{} :FileEntry
       :defs $ {}
-        |*store $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |*store $ %{} :CodeEntry (:doc |)
           :code $ quote (defatom *store schema/store)
           :examples $ []
-        |dispatch! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |dispatch! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn dispatch! (op)
               when config/dev? $ println |Dispatch: op
@@ -267,7 +278,8 @@
                     (:states cursor s) (update-states store cursor s)
                     _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
-        |main! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |main! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn main! ()
               println "|Running mode:" $ if config/dev? |dev |release
@@ -278,21 +290,25 @@
                   {} $ :text (lorem-ipsum/loremIpsum)
               println "|app started!"
           :examples $ []
-        |mount-target $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |mount-target $ %{} :CodeEntry (:doc |)
           :code $ quote
             def mount-target $ js/document.querySelector |.app
           :examples $ []
-        |reload! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |reload! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
               dispatch! $ :: action/create
                 {} $ :text (lorem-ipsum/loremIpsum)
           :examples $ []
-        |render-app! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |render-app! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn render-app! (renderer)
               renderer mount-target (comp-container @*store) dispatch!
           :examples $ []
+          :schema $ :: 'Dynamic
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns respo-message.main $ :require
@@ -307,7 +323,7 @@
             respo-message.config :as config
     |respo-message.schema $ %{} :FileEntry
       :defs $ {}
-        |message $ %{} :CodeEntry (:doc "|Schema definition for a message object. Contains :id (auto-generated), :token (optional user-defined), :text (message content), :time (creation timestamp), and :style (custom CSS styles).") (:schema :dynamic)
+        |message $ %{} :CodeEntry (:doc "|Schema definition for a message object. Contains :id (auto-generated), :token (optional user-defined), :text (message content), :time (creation timestamp), and :style (custom CSS styles).")
           :code $ quote
             def message $ {} (:id nil) (:token nil) (:text |) (:time 0)
               :style $ {}
@@ -318,7 +334,8 @@
               {} (:text "|Error occurred")
                 :style $ {}
                   :background-color $ hsl 0 80 60
-        |store $ %{} :CodeEntry (:doc "|Schema definition for the message store. Contains :messages (hashmap of messages by id) and :states (component states storage).") (:schema :dynamic)
+          :schema $ :: 'Dynamic
+        |store $ %{} :CodeEntry (:doc "|Schema definition for the message store. Contains :messages (hashmap of messages by id) and :states (component states storage).")
           :code $ quote
             def store $ {}
               :messages $ {}
@@ -329,11 +346,12 @@
               {} $ :messages
                 {} $ |msg-1
                   {} $ :text |Hello
+          :schema $ :: 'Dynamic
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote (ns respo-message.schema)
     |respo-message.updater $ %{} :FileEntry
       :defs $ {}
-        |update-messages $ %{} :CodeEntry (:doc "|Updater function that processes message actions and updates the messages state. Handles create, clear, and remove-one operations. Should be called from your main updater when action/message-action? returns true.") (:schema :dynamic)
+        |update-messages $ %{} :CodeEntry (:doc "|Updater function that processes message actions and updates the messages state. Handles create, clear, and remove-one operations. Should be called from your main updater when action/message-action? returns true.")
           :code $ quote
             defn update-messages (messages op op-data op-id op-time)
               cond
@@ -352,10 +370,16 @@
                     dissoc messages $ :id op-data
                 true messages
           :examples $ []
-            quote $ update-messages ({}) action/create
-              {} $ :text |Hello
-              , |id-1 1234567890
-            quote $ update-messages existing-messages action/clear nil |id-2 1234567891
+            quote $ assert= 1
+              count $ respo-message.updater/update-messages ({}) respo-message.action/create
+                {} $ :text |Hello
+                , |id-1 1234567890
+            quote $ assert= 0
+              count $ respo-message.updater/update-messages
+                {} $ :id-1
+                  {} $ :text |Old
+                , respo-message.action/clear nil |id-2 1234567891
+          :schema $ :: 'Dynamic
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns respo-message.updater $ :require (respo-message.schema :as schema) (respo-message.action :as action)

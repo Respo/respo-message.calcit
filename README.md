@@ -10,32 +10,36 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 Public APIs:
 
-```cirru
+```cirru.no-check
 respo-message.action/message-action?
+
 respo-message.action/create
+
 respo-message.action/clear
+
 respo-message.action/remove-one
+
 respo-message.action/dict
+
 respo-message.updater/update-messages
+
 respo-message.comp.messages/comp-messages
 ```
 
 To mount component and show a message, by default it shows for 4 seconds:
 
-```cirru
+```cirru.no-check
 comp-messages (:messages store)
-  {} (:bottom? true)
-  fn (info d!)
-    d! action/remove-one info
+  {} $ :bottom? true
+  fn (info d!) (d! action/remove-one info)
 ```
 
-```cirru
+```cirru.no-check
 dispatch! action/create $ {}
-  :text (lorem-ipsum)
-  :token "|xxx"
+  :text $ lorem-ipsum
+  :token |xxx
 
-dispatch! action/remove-one $ {}
-  :token "|xxx"
+dispatch! action/remove-one $ {} (:token |xxx)
 ```
 
 Messages can be removed with `:id` or `:token`, where `:token` is what you can generate.
@@ -45,12 +49,12 @@ Sorry but the component gets even harder to setup:
 ```cirru
 defn dispatch! (op op-data)
   let
-      op-id (generate-id!)
-      op-time (js/Date.now)
+      op-id $ generate-id!
+      op-time $ js/Date.now
       store @*store
     reset! *store $ cond
-      (= op :states)
-        update store :states (mutate op-data)
+        = op :states
+        update store :states $ mutate op-data
       (action/message-action? op)
         update store :messages $ \ update-messages % op op-data op-id op-time
       true $ do (println "|Unhandled operation:" op) store
