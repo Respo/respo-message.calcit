@@ -28,6 +28,7 @@ jobs:
       run: >
         caps --ci
         && yarn install --immutable
+        && cr calcit.cirru --check-only
         && cr js
         && yarn vite build --base=./
 
