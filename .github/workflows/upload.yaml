@@ -24,13 +24,17 @@ jobs:
 
     - uses: calcit-lang/setup-cr@0.0.9
 
-    - name: "compiles to js"
-      run: >
-        caps --ci
-        && yarn install --immutable
-        && cr calcit.cirru --check-only
-        && cr js
-        && yarn vite build --base=./
+    - name: "install and compile"
+      run: caps --ci && yarn install --immutable && cr calcit.cirru --check-only && cr js
+
+    - name: "run unit tests"
+      run: yarn check:unit
+
+    - name: "check deprecated APIs"
+      run: yarn check:deprecated
+
+    - name: "build Vite bundle"
+      run: yarn vite build --base=./
 
     - name: Deploy to server
       id: deploy

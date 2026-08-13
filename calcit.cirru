@@ -2,7 +2,7 @@
 {} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-message) (:version |0.0.10)
   :entries $ {}
     :default $ {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :native) (:reload-fn 'respo-message.main/reload!)
-      :modules $ [] |lilac/ |respo.calcit/ |memof/ |respo-ui.calcit/
+      :modules $ [] |respo.calcit/ |respo-ui.calcit/
       :type-slots $ {}
   :files $ {}
     |respo-message.action $ %{} 'FileEntry
@@ -392,6 +392,24 @@
                   {} $ :text |Old
                 , respo-message.action/clear nil |id-2 1234567891
           :schema $ :: 'Dynamic
+          :tests $ []
+            %{} 'TestEntry (:name |creates-message)
+              :code $ quote
+                assert= 1 $ count
+                  update-messages ({}) action/create
+                    {} $ :text |Hello
+                    , |id-1 1234567890
+              :tags $ #{} :fast :unit
+            %{} 'TestEntry (:name |removes-message-by-token)
+              :code $ quote
+                assert= 0 $ count
+                  update-messages
+                    {} $ :old
+                      {} $ :token |gone
+                    , action/remove-one
+                      {} $ :token |gone
+                      , |id-2 1234567891
+              :tags $ #{} :fast :unit
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.updater $ :require (respo-message.schema :as schema) (respo-message.action :as action)
