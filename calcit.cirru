@@ -13,14 +13,18 @@
           :examples $ []
             quote $ assert= true (tag? respo-message.action/clear)
             quote $ assert= true (respo-message.action/message-action? respo-message.action/clear)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Dynamic)
+              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
         |create $ %{} 'CodeEntry (:doc "|Action tag for creating a new message. Use it with dispatch! to display a toast message.")
           :code $ quote
             def create $ gen-tag |message/create
           :examples $ []
             quote $ assert= true (tag? respo-message.action/create)
             quote $ assert= true (respo-message.action/message-action? respo-message.action/create)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Dynamic)
+              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
         |dict $ %{} 'CodeEntry (:doc "|Dictionary of all message action tags. Useful for pattern matching and validation.")
           :code $ quote
             def dict $ {} (:create create) (:remove-one remove-one) (:clear clear)
@@ -34,7 +38,9 @@
             defn gen-tag (x)
               turn-tag $ str x |_GEN_ 0
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Tag)
+              :args $ [] 'Dynamic
         |message-action? $ %{} 'CodeEntry (:doc "|Predicate function to check if an operation is a message action. Returns true for create, clear, and remove-one actions.")
           :code $ quote
             defn message-action? (op)
@@ -42,14 +48,18 @@
           :examples $ []
             quote $ assert= true (respo-message.action/message-action? respo-message.action/create)
             quote $ assert= false (respo-message.action/message-action? :unknown-action)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Bool)
+              :args $ [] 'Dynamic
         |remove-one $ %{} 'CodeEntry (:doc "|Action tag for removing a specific message. Messages can be identified by :id or :token field.")
           :code $ quote
             def remove-one $ gen-tag |message/remove-one
           :examples $ []
             quote $ assert= true (tag? respo-message.action/remove-one)
             quote $ assert= true (respo-message.action/message-action? respo-message.action/remove-one)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Dynamic)
+              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote (ns respo-message.action)
     |respo-message.comp.container $ %{} 'FileEntry
@@ -88,7 +98,9 @@
                     fn (info d!) (d! action/remove-one info)
                   when config/dev? $ comp-inspect |messages messages nil
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'respo.schema/Component)
+              :args $ [] 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.container $ :require
@@ -132,7 +144,9 @@
                           , d!
                     <> message-text nil
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'respo.schema/Component)
+              :args $ [] 'Number 'Map 'Map 'Fn
         |css-message $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defstyle css-message $ {}
@@ -227,7 +241,9 @@
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? false
               fn (info) nil
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'respo.schema/Component)
+              :args $ [] 'List 'Map 'Fn
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.messages $ :require
@@ -243,7 +259,7 @@
               (exists? js/process) (= |true js/process.env.cdn)
               true false
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Bool
         |dev? $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def dev? $ let
@@ -287,7 +303,9 @@
                     (:states cursor s) (update-states store cursor s)
                     _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Unit)
+              :args $ [] 'Dynamic
         |main! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn main! ()
@@ -299,25 +317,31 @@
                   {} $ :text (lorem-ipsum/loremIpsum)
               println "|app started!"
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Unit)
+              :args $ []
         |mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def mount-target $ js/document.querySelector |.app
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'String
         |reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
               dispatch! $ :: action/create
                 {} $ :text (lorem-ipsum/loremIpsum)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Unit)
+              :args $ []
         |render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn render-app! (renderer)
               renderer mount-target (comp-container @*store) dispatch!
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Unit)
+              :args $ [] 'Fn
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.main $ :require
@@ -355,7 +379,7 @@
               {} $ :messages
                 {} $ |msg-1
                   {} $ :text |Hello
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Map
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote (ns respo-message.schema)
     |respo-message.updater $ %{} 'FileEntry
@@ -391,7 +415,9 @@
                 {} $ :id-1
                   {} $ :text |Old
                 , respo-message.action/clear nil |id-2 1234567891
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'Map)
+              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
           :tests $ []
             %{} 'TestEntry (:name |creates-message)
               :code $ quote
