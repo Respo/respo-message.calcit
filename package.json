@@ -2,14 +2,14 @@
   "version": "0.0.12",
   "packageManager": "yarn@4.12.0",
   "scripts": {
-    "compile": "cr js",
-    "check:unit": "cr test --tag unit --require-match --summary-only --format json",
-    "check:deprecated": "cr analyze deprecated --summary-only --format json",
+    "compile": "calcit js",
+    "check:unit": "calcit calcit.cirru test --tag unit --require-match --summary-only --format json",
+    "check:deprecated": "calcit calcit.cirru analyze deprecated --summary-only --format json",
     "build": "yarn vite build --base=./",
     "dev": "yarn vite"
   },
   "dependencies": {
-    "@calcit/procs": "^0.13.27"
+    "@calcit/procs": "^0.13.29"
   },
   "devDependencies": {
     "lorem-ipsum": "^2.0.8",
