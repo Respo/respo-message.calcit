@@ -46,9 +46,8 @@ Messages can be removed with `:id` or `:token`, where `:token` is what you can g
 
 ### Calcit 0.13.x
 
-The project uses the canonical `calcit.cirru` snapshot and Calcit 0.13.15.
-The old `compact.cirru` snapshot and the deprecated `lilac`/`memof` modules
-have been removed. Message maps use explicit `Option` handling for optional
+The project uses the canonical `calcit.cirru` snapshot and Calcit 0.13.29.
+The deprecated `lilac`/`memof` modules have been removed. Message maps use explicit `Option` handling for optional
 fields; new tests use the built-in `calcit.test` support.
 
 Before submitting a change, run:
@@ -56,8 +55,8 @@ Before submitting a change, run:
 ```bash
 caps --ci
 yarn install --immutable
-cr calcit.cirru --check-only
-cr calcit.cirru js
+calcit calcit.cirru --check-only
+calcit calcit.cirru js
 yarn check:unit
 yarn check:deprecated
 yarn vite build --base=./
