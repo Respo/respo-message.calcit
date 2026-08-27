@@ -81,13 +81,16 @@
                         :on-click $ fn (e d!)
                           let
                               new-token $ generate-id!
-                            d! action/create $ merge schema/message
-                              {} (:token new-token)
-                                :text $ lorem-ipsum/loremIpsum
-                            js/setTimeout
-                              fn () $ d! action/remove-one
-                                {} $ :token new-token
-                              , 2000
+                            do
+                              d! action/create $ merge schema/message
+                                {} (:token new-token)
+                                  :text $ lorem-ipsum/loremIpsum
+                              js/setTimeout
+                                fn () $ do
+                                  d! action/remove-one $ {} (:token new-token)
+                                  , &unit
+                                , 2000
+                              , &unit
                       <> |Try
                     =< 16 nil
                     button
