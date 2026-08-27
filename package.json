@@ -1,5 +1,5 @@
 {
-  "version": "0.0.12",
+  "version": "0.0.13",
   "packageManager": "yarn@4.12.0",
   "scripts": {
     "compile": "calcit calcit.cirru js",
@@ -9,7 +9,7 @@
     "dev": "yarn vite"
   },
   "dependencies": {
-    "@calcit/procs": "^0.13.29"
+    "@calcit/procs": "0.13.51"
   },
   "devDependencies": {
     "lorem-ipsum": "^2.0.8",
