@@ -1,5 +1,5 @@
 {
-  "version": "0.0.15",
+  "version": "0.0.16",
   "packageManager": "yarn@4.12.0",
   "scripts": {
     "compile": "calcit calcit.cirru js",
