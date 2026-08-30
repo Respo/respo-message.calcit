@@ -1,6 +1,5 @@
 
-Respo Message for calcit-js
-----
+## Respo Message for Calcit
 
 > Message component for Respo apps.
 
@@ -46,14 +45,15 @@ Messages can be removed with `:id` or `:token`, where `:token` is what you can g
 
 ### Calcit 0.13.x
 
-The project uses the canonical `calcit.cirru` snapshot and Calcit 0.13.29.
+The project uses the canonical `calcit.cirru` snapshot and Calcit 0.13.64.
 The deprecated `lilac`/`memof` modules have been removed. Message maps use explicit `Option` handling for optional
 fields; new tests use the built-in `calcit.test` support.
 
 Before submitting a change, run:
 
 ```bash
-caps --ci
+caps --ci --strict
+caps verify --toolchain
 yarn install --immutable
 calcit calcit.cirru --check-only
 calcit calcit.cirru js
@@ -81,3 +81,9 @@ defn dispatch! (op op-data)
 ### License
 
 MIT
+
+### 中文说明
+
+本模块为 Calcit/Respo 应用提供消息组件及对应 updater。项目使用 canonical
+`calcit.cirru`，Calcit 与 `@calcit/procs` 保持 0.13.64 lockstep，并固定
+到已发布的 Respo UI tag。
