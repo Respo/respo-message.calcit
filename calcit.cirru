@@ -247,7 +247,7 @@
               fn (info) nil
           :schema $ :: 'Fn
             {} (:return 'respo.schema/Component)
-              :args $ [] 'Map 'Map 'Fn
+              :args $ [] (:: 'Map 'String 'Dynamic) 'Map 'Fn
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.messages $ :require
