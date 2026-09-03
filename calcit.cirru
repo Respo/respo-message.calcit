@@ -247,7 +247,7 @@
               fn (info) nil
           :schema $ :: 'Fn
             {} (:return 'respo.schema/Component)
-              :args $ [] 'List 'Map 'Fn
+              :args $ [] 'Map 'Map 'Fn
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.messages $ :require
@@ -271,7 +271,8 @@
               cond
                   exists? js/window
                   , debug?
-                (exists? js/process) (not= |true js/process.env.release)
+                (exists? js/process)
+                  not= |true $ unsafe-coerce js/process.env.release String
                 true true
           :examples $ []
           :schema $ :: 'Fn
@@ -406,6 +407,7 @@
                         filter $ fn (pair)
                           let[] (k message) pair $ not= token
                             option:unwrap-or (get message :token) nil
+                        .to-list
                         pairs-map
                       dissoc messages message-id
                 true messages
