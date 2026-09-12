@@ -1,5 +1,5 @@
 
-{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `calcit query` to inspect and `calcit edit`/`calcit tree` to modify. Run `calcit docs agents --full` first. Manual edits must follow format and schema conventions, then run `calcit edit format`.") (:package |respo-message)
+{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `calcit query` to inspect and `calcit edit`/`calcit tree` to modify. Run `calcit docs agents --contract` before mutations; use `--full` for first orientation or changed contract digest. Manual edits must follow format and schema conventions, then run `calcit edit format`.") (:package |respo-message)
   :entries $ {}
     :default $ {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :native) (:reload-fn 'respo-message.main/reload!)
       :feature-policy $ {}
@@ -16,7 +16,7 @@
             quote $ assert= true (respo-message.action/message-action? respo-message.action/clear)
           :schema $ :: 'Fn
             {} (:return 'Dynamic)
-              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+              :args $ [] (:: 'Map 'Dynamic 'Dynamic) 'Dynamic 'Dynamic 'Dynamic 'Dynamic
         'create $ %{} 'CodeEntry (:doc "|Action tag for creating a new message. Use it with dispatch! to display a toast message.")
           :code $ quote
             def create $ gen-tag |message/create
@@ -25,7 +25,7 @@
             quote $ assert= true (respo-message.action/message-action? respo-message.action/create)
           :schema $ :: 'Fn
             {} (:return 'Dynamic)
-              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+              :args $ [] (:: 'Map 'Dynamic 'Dynamic) 'Dynamic 'Dynamic 'Dynamic 'Dynamic
         'dict $ %{} 'CodeEntry (:doc "|Dictionary of all message action tags. Useful for pattern matching and validation.")
           :code $ quote
             def dict $ {} (:create create) (:remove-one remove-one) (:clear clear)
@@ -60,7 +60,7 @@
             quote $ assert= true (respo-message.action/message-action? respo-message.action/remove-one)
           :schema $ :: 'Fn
             {} (:return 'Dynamic)
-              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+              :args $ [] (:: 'Map 'Dynamic 'Dynamic) 'Dynamic 'Dynamic 'Dynamic 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote (ns respo-message.action)
     'respo-message.comp.container $ %{} 'FileEntry
@@ -69,7 +69,7 @@
           :code $ quote
             defcomp comp-container (store)
               let
-                  messages $ option:unwrap-or (get store :messages) ({})
+                  messages $ or (&map:get store :messages) ({})
                 div
                   {}
                     :class-name $ str-spaced css/global css/fullscreen
@@ -82,7 +82,7 @@
                           let
                               new-token $ generate-id!
                             do
-                              d! action/create $ merge schema/message
+                              d! action/create $ &merge schema/message
                                 {} (:token new-token)
                                   :text $ lorem-ipsum/loremIpsum
                               js/setTimeout
@@ -105,6 +105,7 @@
           :schema $ :: 'Fn
             {} (:return 'respo.schema/Component)
               :args $ [] 'Dynamic
+              :features $ #{} :js-ffi
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.container $ :require
@@ -121,20 +122,46 @@
             respo-message.config :as config
     'respo-message.comp.message $ %{} 'FileEntry
       :defs $ {}
+        'MessageDom $ %{} 'CodeEntry (:doc |)
+          :code $ quote
+            deftrait MessageDom
+              (:style 'MessageStyle)
+              (:parent-element 'JsNullish 'MessageDom)
+              .clone-node $ :: 'Fn
+                {} (:args [] 'Bool) (:return 'MessageDom)
+              .append-child $ :: 'Fn
+                {} (:args [] 'MessageDom) (:return 'MessageDom)
+              .remove $ :: 'Fn
+                {} (:args []) (:return 'Unit)
+          :examples $ []
+          :ffi $ {} (:backend :js) (:kind :external-object)
+            :names $ {} (:append-child |appendChild) (:clone-node |cloneNode) (:parent-element |parentElement)
+          :schema $ :: 'Trait
+        'MessageStyle $ %{} 'CodeEntry (:doc |)
+          :code $ quote
+            deftrait MessageStyle
+              (:transform 'String)
+              (:opacity 'Dynamic)
+              (:z-index 'String)
+          :examples $ []
+          :ffi $ {} (:backend :js) (:kind :external-object)
+            :names $ {} (:z-index |zIndex)
+            :writable $ #{} :opacity :transform :z-index
+          :schema $ :: 'Trait
         'comp-message $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defcomp comp-message (idx message options on-remove!)
               let
-                  bottom? $ option:unwrap-or (get options :bottom?) false
-                  message-style $ option:unwrap-or (get message :style) ({})
-                  message-id $ option:unwrap-or (get message :id) nil
-                  message-token $ option:unwrap-or (get message :token) nil
-                  message-time $ option:unwrap-or (get message :time) 0
-                  message-text $ option:unwrap-or (get message :text) ||
+                  bottom? $ or (&map:get options :bottom?) false
+                  message-style $ or (&map:get message :style) ({})
+                  message-id $ or (&map:get message :id) nil
+                  message-token $ or (&map:get message :token) nil
+                  message-time $ or (&map:get message :time) 0
+                  message-text $ or (&map:get message :text) ||
                 [] (effect-fade message idx bottom?)
                   div
                     {} (:class-name css-message)
-                      :style $ merge message-style
+                      :style $ &merge message-style
                         if bottom?
                           {} $ :bottom
                             str
@@ -150,7 +177,7 @@
           :examples $ []
           :schema $ :: 'Fn
             {} (:return 'respo.schema/Component)
-              :args $ [] 'Number 'Map 'Map 'Fn
+              :args $ [] 'Number (:: 'Map 'Dynamic 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
         'css-message $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defstyle css-message $ {}
@@ -179,27 +206,31 @@
                   dy $ if bottom? 0 (* idx 40)
                 case-default action nil
                   :mount $ let
-                      style $ unsafe-coerce (.-style el) 'JsObject
+                      style $ unsafe-coerce
+                        .-style $ unsafe-coerce el MessageDom
+                        , MessageStyle
                     set! (.-transform style) (str "|translate(60px," dy "|px)")
                     set! (.-opacity style) |0
                     js/setTimeout
                       fn ()
                         set! (.-transform style) (str "|translate(0px," dy "|px)")
                         set! (.-opacity style) |1
-                        set! (.-zIndex style) |-1
+                        set! (.-z-index style) |-1
                       , 10
                   :unmount $ let
-                      cloned $ unsafe-coerce (.!cloneNode el true) 'JsObject
-                      style $ unsafe-coerce (.-style cloned) 'JsObject
-                      parent $ unsafe-coerce (.-parentElement el) 'JsObject
-                    .!appendChild parent cloned
+                      cloned $ unsafe-coerce
+                        .clone-node (unsafe-coerce el MessageDom) true
+                        , MessageDom
+                      style $ unsafe-coerce (.-style cloned) MessageStyle
+                      parent $ .-parent-element (unsafe-coerce el MessageDom)
+                    .append-child parent cloned
                     js/setTimeout
                       fn ()
                         set! (.-transform style) (str "|translate(60px," dy "|px)")
                         set! (.-opacity style) |0
                       , 10
                     js/setTimeout
-                      fn () $ .!remove cloned
+                      fn () $ .remove cloned
                       , 400
           :examples $ []
           :schema $ :: 'Fn
@@ -220,7 +251,7 @@
           :code $ quote
             defcomp comp-messages (messages options on-remove!)
               let
-                  bottom? $ option:unwrap-or (get options :bottom?) false
+                  bottom? $ or (&map:get options :bottom?) false
                 list->
                   {} $ :style
                     if bottom?
@@ -228,15 +259,15 @@
                       {} (:position :fixed) (:top 0) (:right 0)
                   -> messages
                     either $ {}
-                    vals
-                    .to-list
+                    &map:vals
+                    &set:to-list
                     sort $ fn (message m)
                       -
-                        option:unwrap-or (get m :time) 0
-                        option:unwrap-or (get message :time) 0
+                        or (&map:get m :time) 0
+                        or (&map:get message :time) 0
                     map-indexed $ fn (idx message)
                       []
-                        option:unwrap-or (get message :id) |
+                        or (&map:get message :id) |
                         comp-message idx message options on-remove!
           :examples $ []
             quote $ respo-message.comp.messages/comp-messages ({})
@@ -247,7 +278,7 @@
               fn (info) nil
           :schema $ :: 'Fn
             {} (:return 'respo.schema/Component)
-              :args $ [] (:: 'Map 'String 'Dynamic) 'Map 'Fn
+              :args $ [] (:: 'Map 'String 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.messages $ :require
@@ -260,7 +291,7 @@
             def cdn? $ cond
                 exists? js/window
                 , false
-              (exists? js/process) (= |true js/process.env.cdn)
+              (exists? js/process) (&= |true js/process.env.cdn)
               true false
           :examples $ []
           :schema $ :: 'Bool
@@ -291,26 +322,20 @@
         '*store $ %{} 'CodeEntry (:doc |)
           :code $ quote (defatom *store schema/store)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Ref (:: 'Map 'Dynamic 'Dynamic)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn dispatch! (op)
               when config/dev? $ println |Dispatch: op
               let
                   op-id $ generate-id!
-                  op-time $ js/Date.now
-                  store @*store
-                reset! *store $ if
-                  action/message-action? $ nth op 0
-                  update store :messages $ fn (x)
-                    update-messages x (nth op 0) (nth op 1) op-id op-time
-                  match op
-                    (:states cursor s) (update-states store cursor s)
-                    _ $ do (eprintln "|Unhandled operation:" op) store
+                  op-time $ unsafe-coerce js/Date.now 'Number
+                reset! *store $ next-store-of op op-id op-time
           :examples $ []
           :schema $ :: 'Fn
             {} (:return 'Unit)
               :args $ [] 'Dynamic
+              :features $ #{} :js-ffi
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn main! ()
@@ -325,11 +350,35 @@
           :schema $ :: 'Fn
             {} (:return 'Unit)
               :args $ []
+              :features $ #{} :js-ffi
         'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote
-            def mount-target $ js/document.querySelector |.app
+            defn mount-target () $ js/document.querySelector |.app
           :examples $ []
-          :schema $ :: 'String
+          :schema $ :: 'Fn
+            {} (:return 'Dynamic)
+              :args $ []
+              :features $ #{} :js-ffi
+        'next-store-of $ %{} 'CodeEntry (:doc |)
+          :code $ quote
+            defn next-store-of (op op-id op-time)
+              let
+                  store @*store
+                if
+                  action/message-action? $ &list:nth op 0
+                  let
+                      next-messages $ update-messages (&map:get store :messages) (&list:nth op 0) (&list:nth op 1) op-id op-time
+                    &map:assoc store :messages next-messages
+                  match op
+                    (:states cursor s)
+                      assert-type (update-states store cursor s) (:: 'Map 'Dynamic 'Dynamic)
+                    _ $ do (eprintln "|Unhandled operation:" op) store
+          :examples $ []
+          :schema $ :: 'Fn
+            {}
+              :args $ [] 'Dynamic 'String 'Number
+              :features $ #{} :js-ffi
+              :return $ :: 'Map 'Dynamic 'Dynamic
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
@@ -342,7 +391,7 @@
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn render-app! (renderer)
-              renderer mount-target (comp-container @*store) dispatch!
+              renderer (mount-target) (comp-container @*store) dispatch!
           :examples $ []
           :schema $ :: 'Fn
             {} (:return 'Unit)
@@ -366,9 +415,9 @@
             def message $ {} (:id nil) (:token nil) (:text |) (:time 0)
               :style $ {}
           :examples $ []
-            quote $ merge schema/message
+            quote $ &merge schema/message
               {} (:text |Hello) (:token |msg-1)
-            quote $ merge schema/message
+            quote $ &merge schema/message
               {} (:text "|Error occurred")
                 :style $ {}
                   :background-color $ hsl 0 80 60
@@ -380,7 +429,7 @@
               :states $ {}
           :examples $ []
             quote $ schema/store
-            quote $ merge schema/store
+            quote $ &merge schema/store
               {} $ :messages
                 {} $ |msg-1
                   {} $ :text |Hello
@@ -393,23 +442,23 @@
           :code $ quote
             defn update-messages (messages op op-data op-id op-time)
               cond
-                  = op action/clear
+                  &= op action/clear
                   {}
-                (= op action/create)
-                  assoc messages op-id $ merge schema/message op-data
+                (&= op action/create)
+                  &map:assoc messages op-id $ &merge (&merge schema/message op-data)
                     {} (:id op-id) (:time op-time)
-                (= op action/remove-one)
+                (&= op action/remove-one)
                   let
-                      token $ option:unwrap-or (get op-data :token) nil
-                      message-id $ option:unwrap-or (get op-data :id) nil
+                      token $ or (&map:get op-data :token) nil
+                      message-id $ or (&map:get op-data :id) nil
                     if (some? token)
                       -> messages (to-pairs)
                         filter $ fn (pair)
-                          let[] (k message) pair $ not= token
-                            option:unwrap-or (get message :token) nil
-                        .to-list
+                          let[] (k message) pair $ not
+                            &= token $ or (&map:get message :token) nil
+                        &set:to-list
                         pairs-map
-                      dissoc messages message-id
+                      &map:dissoc messages message-id
                 true messages
           :examples $ []
             quote $ assert= 1
@@ -422,8 +471,9 @@
                   {} $ :text |Old
                 , respo-message.action/clear nil |id-2 1234567891
           :schema $ :: 'Fn
-            {} (:return 'Map)
-              :args $ [] 'Map 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+            {}
+              :args $ [] (:: 'Map 'Dynamic 'Dynamic) 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+              :return $ :: 'Map 'Dynamic 'Dynamic
           :tests $ []
             %{} 'TestEntry (:name |creates-message)
               :code $ quote
