@@ -264,8 +264,7 @@
               fn (info) nil
           :schema $ :: 'Fn $ {}
             :return 'respo.schema/Component
-            :args $ [] (:: 'Map 'String 'Message) (:: 'Map 'Dynamic 'Dynamic) 'Fn
-            :generics $ [] 'Message
+            :args $ [] (:: 'Map 'String 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.messages
           :require
