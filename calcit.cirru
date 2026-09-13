@@ -3,11 +3,7 @@
   :about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `calcit query` to inspect and `calcit edit`/`calcit tree` to modify. Run `calcit docs agents --contract` before mutations; use `--full` for first orientation or changed contract digest. Manual edits must follow format and schema conventions, then run `calcit edit format`."
   :package |respo-message
   :entries $ {} $ :default
-    {} (:description |)
-      :init-fn 'respo-message.main/main!
-      :mode :native
-      :reload-fn 'respo-message.main/reload!
-      :target :browser
+    {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :native) (:reload-fn 'respo-message.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |js-ffi/
       :type-slots $ {}
@@ -35,8 +31,7 @@
           :code $ quote $ def dict
             {} (:create create) (:remove-one remove-one) (:clear clear)
           :examples $ []
-            quote $ assert= true $ option:some?
-              get respo-message.action/dict :create
+            quote $ assert= true $ option:some? (get respo-message.action/dict :create)
             quote $ assert= 3 $ count respo-message.action/dict
           :schema $ :: 'Dynamic
         'gen-tag $ %{} 'CodeEntry (:doc |)
@@ -56,8 +51,7 @@
             :args $ [] 'Dynamic
         'remove-one $ %{} 'CodeEntry
           :doc "|Action tag for removing a specific message. Messages can be identified by :id or :token field."
-          :code $ quote $ def remove-one
-            gen-tag |message/remove-one
+          :code $ quote $ def remove-one (gen-tag |message/remove-one)
           :examples $ []
             quote $ assert= true $ tag? respo-message.action/remove-one
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/remove-one
@@ -99,12 +93,10 @@
                     <> |Clear
                 comp-messages messages
                   {} $ :bottom? false
-                  fn (info d!)
-                    d! action/remove-one info
+                  fn (info d!) (d! action/remove-one info)
                 when config/dev? $ comp-inspect |messages messages nil
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Dynamic
             :features $ #{} :js-ffi
       :ns $ %{} 'NsEntry (:doc |)
@@ -168,8 +160,7 @@
                         , d!
                   <> message-text nil
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Number (:: 'Map 'Dynamic 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
         'css-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-message
@@ -262,8 +253,7 @@
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? false
               fn (info) nil
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] (:: 'Map 'String 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.messages
@@ -277,8 +267,7 @@
             cond
                 exists? js/window
                 , false
-              (exists? js/process)
-                &= |true js/process.env.cdn
+              (exists? js/process) (&= |true js/process.env.cdn)
               true false
           :examples $ []
           :schema $ :: 'Bool
@@ -298,13 +287,7 @@
             :features $ #{} :js-ffi
         'site $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def site
-            {}
-              :dev-ui |http://localhost:8100/main-fonts.css
-              :release-ui |http://cdn.tiye.me/favored-fonts/main-fonts.css
-              :cdn-url |http://cdn.tiye.me/respo-message/
-              :title |Message
-              :icon |http://cdn.tiye.me/logo/respo.png
-              :storage-key |respo-message
+            {} (:dev-ui |http://localhost:8100/main-fonts.css) (:release-ui |http://cdn.tiye.me/favored-fonts/main-fonts.css) (:cdn-url |http://cdn.tiye.me/respo-message/) (:title |Message) (:icon |http://cdn.tiye.me/logo/respo.png) (:storage-key |respo-message)
           :examples $ []
           :schema $ :: 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
@@ -332,16 +315,14 @@
             render-app! render!
             add-watch *store :changes $ fn (store prev) (render-app! render!)
             js/setTimeout $ fn () $ dispatch!
-              :: action/create $ {} $ :text
-                lorem-ipsum/loremIpsum
+              :: action/create $ {} $ :text (lorem-ipsum/loremIpsum)
             println "|app started!"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
             :features $ #{} :js-ffi
         'mount-target $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn mount-target ()
-            js/document.querySelector |.app
+          :code $ quote $ defn mount-target () (js/document.querySelector |.app)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Dynamic)
             :args $ []
@@ -358,9 +339,7 @@
                 match op
                   (:states cursor s)
                     assert-type (update-states store cursor s) (:: 'Map 'Dynamic 'Dynamic)
-                  _ $ do
-                    eprintln "|Unhandled operation:" op
-                    , store
+                  _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] 'Dynamic 'String 'Number
@@ -460,8 +439,7 @@
                   {} $ :text |Hello
                   , |id-1 1234567890
               :tags $ #{} :fast :unit
-            %{} 'TestEntry
-              :name |removes-message-by-token
+            %{} 'TestEntry (:name |removes-message-by-token)
               :code $ quote $ assert= 0
                 count $ update-messages
                   {} $ :old $ {} (:token |gone)
@@ -471,6 +449,4 @@
               :tags $ #{} :fast :unit
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.updater
-          :require
-            respo-message.schema :as schema
-            respo-message.action :as action
+          :require (respo-message.schema :as schema) (respo-message.action :as action)
