@@ -1,7 +1,7 @@
 
 {} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `calcit query` to inspect and `calcit edit`/`calcit tree` to modify. Run `calcit docs agents --contract` before mutations; use `--full` for first orientation or changed contract digest. Manual edits must follow format and schema conventions, then run `calcit edit format`.") (:package |respo-message)
   :entries $ {}
-    :default $ {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :native) (:reload-fn 'respo-message.main/reload!)
+    :default $ {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :native) (:reload-fn 'respo-message.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |js-ffi/
       :type-slots $ {}
@@ -257,10 +257,7 @@
                     if bottom?
                       {} (:position :fixed) (:bottom 0) (:right 0)
                       {} (:position :fixed) (:top 0) (:right 0)
-                  -> messages
-                    either $ {}
-                    &map:vals
-                    &set:to-list
+                  -> messages (vals) (&set:to-list)
                     sort $ fn (message m)
                       -
                         or (&map:get m :time) 0
@@ -278,7 +275,8 @@
               fn (info) nil
           :schema $ :: 'Fn
             {} (:return 'respo.schema/Component)
-              :args $ [] (:: 'Map 'String 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
+              :args $ [] (:: 'Map 'String 'Message) (:: 'Map 'Dynamic 'Dynamic) 'Fn
+              :generics $ [] 'Message
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote
           ns respo-message.comp.messages $ :require
