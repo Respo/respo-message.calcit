@@ -115,27 +115,6 @@
             respo-message.config :as config
     'respo-message.comp.message $ %{} 'FileEntry
       :defs $ {}
-        'MessageDom $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait MessageDom
-            (:style 'MessageStyle)
-            (:parent-element 'JsNullish 'MessageDom)
-            .clone-node $ :: 'Fn $ {} (:args [] 'Bool) (:return 'MessageDom)
-            .append-child $ :: 'Fn $ {} (:args [] 'MessageDom) (:return 'MessageDom)
-            .remove $ :: 'Fn $ {} (:args []) (:return 'Unit)
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-            :names $ {} (:append-child |appendChild) (:clone-node |cloneNode) (:parent-element |parentElement)
-          :schema $ :: 'Trait
-        'MessageStyle $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait MessageStyle
-            (:transform 'String)
-            (:opacity 'Dynamic)
-            (:z-index 'String)
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-            :names $ {} $ :z-index |zIndex
-            :writable $ #{} :opacity :transform :z-index
-          :schema $ :: 'Trait
         'comp-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-message (idx message options on-remove!)
             let
@@ -188,31 +167,27 @@
                 dy $ if bottom? 0 $ * idx 40
               case-default action nil
                 :mount $ let
-                    style $ unsafe-coerce
-                      .-style $ unsafe-coerce el MessageDom
-                      , MessageStyle
-                  set! (.-transform style) (str "|translate(60px," dy "|px)")
-                  set! (.-opacity style) |0
-                  js/setTimeout
+                    element $ unsafe-coerce el 'js-ffi.browser/DomElementHost
+                  browser/element-set-style! element |transform $ str "|translate(60px," dy "|px)"
+                  browser/element-set-style! element |opacity |0
+                  browser/set-timeout!
                     fn ()
-                      set! (.-transform style) (str "|translate(0px," dy "|px)")
-                      set! (.-opacity style) |1
-                      set! (.-z-index style) |-1
+                      browser/element-set-style! element |transform $ str "|translate(0px," dy "|px)"
+                      browser/element-set-style! element |opacity |1
+                      browser/element-set-style! element |zIndex |-1
                     , 10
                 :unmount $ let
-                    cloned $ unsafe-coerce
-                      .clone-node (unsafe-coerce el MessageDom) true
-                      , MessageDom
-                    style $ unsafe-coerce (.-style cloned) MessageStyle
-                    parent $ .-parent-element $ unsafe-coerce el MessageDom
-                  .append-child parent cloned
-                  js/setTimeout
+                    element $ unsafe-coerce el 'js-ffi.browser/DomElementHost
+                    cloned $ element .clone-node true
+                    parent $ unsafe-coerce (element :parent-element) 'js-ffi.browser/DomElementHost
+                  parent .append-child! cloned
+                  browser/set-timeout!
                     fn ()
-                      set! (.-transform style) (str "|translate(60px," dy "|px)")
-                      set! (.-opacity style) |0
+                      browser/element-set-style! cloned |transform $ str "|translate(60px," dy "|px)"
+                      browser/element-set-style! cloned |opacity |0
                     , 10
-                  js/setTimeout
-                    fn () $ .remove cloned
+                  browser/set-timeout!
+                    fn () $ cloned .remove!
                     , 400
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Dynamic)
@@ -226,6 +201,7 @@
             respo.util.format :refer $ hsl
             respo-message.schema :as schema
             respo.css :refer $ defstyle
+            js-ffi.browser :as browser
     'respo-message.comp.messages $ %{} 'FileEntry
       :defs $ {} $ 'comp-messages
         %{} 'CodeEntry
@@ -303,7 +279,7 @@
             when config/dev? $ println |Dispatch: op
             let
                 op-id $ generate-id!
-                op-time $ unsafe-coerce js/Date.now 'Number
+                op-time $ shared/now-ms
               reset! *store $ next-store-of op op-id op-time
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
@@ -314,15 +290,20 @@
             println "|Running mode:" $ if config/dev? |dev |release
             render-app! render!
             add-watch *store :changes $ fn (store prev) (render-app! render!)
-            js/setTimeout $ fn () $ dispatch!
-              :: action/create $ {} $ :text (lorem-ipsum/loremIpsum)
+            browser/set-timeout!
+              fn () $ dispatch! $ :: action/create
+                {} $ :text $ lorem-ipsum/loremIpsum
+              , 0
             println "|app started!"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
             :features $ #{} :js-ffi
         'mount-target $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn mount-target () (js/document.querySelector |.app)
+          :code $ quote $ defn mount-target ()
+            unsafe-coerce
+              option:unwrap $ browser/query-selector |.app
+              , 'Dynamic
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Dynamic)
             :args $ []
@@ -370,6 +351,8 @@
             respo-message.updater :refer $ update-messages
             respo-message.action :as action
             respo-message.config :as config
+            js-ffi.browser :as browser
+            js-ffi.shared :as shared
     'respo-message.schema $ %{} 'FileEntry
       :defs $ {}
         'message $ %{} 'CodeEntry
