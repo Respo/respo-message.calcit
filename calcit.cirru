@@ -76,15 +76,14 @@
                       :on-click $ fn (e d!)
                         let
                             new-token $ generate-id!
-                          do
-                            d! action/create $ &merge schema/message $ {} (:token new-token)
-                              :text $ lorem-ipsum/loremIpsum
-                            js/setTimeout
-                              fn () $ do
-                                d! action/remove-one $ {} $ :token new-token
-                                , &unit
-                              , 2000
-                            , &unit
+                          d! action/create $ &merge schema/message $ {} (:token new-token)
+                            :text $ lorem-ipsum/loremIpsum
+                          js/setTimeout
+                            fn ()
+                              d! action/remove-one $ {} $ :token new-token
+                              , &unit
+                            , 2000
+                          , &unit
                     <> |Try
                   =< 16 nil
                   button
@@ -239,14 +238,20 @@
     'respo-message.config $ %{} 'FileEntry
       :defs $ {}
         'cdn? $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def cdn?
+          :code $ quote $ def cdn? (detect-cdn?)
+          :examples $ []
+          :schema $ :: 'Bool
+        'detect-cdn? $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn detect-cdn? ()
             cond
                 exists? js/window
                 , false
               (exists? js/process) (&= |true js/process.env.cdn)
               true false
           :examples $ []
-          :schema $ :: 'Bool
+          :schema $ :: 'Fn $ {} (:return 'Bool)
+            :args $ []
+            :features $ #{} :js-ffi
         'dev? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dev?
             let
@@ -313,9 +318,14 @@
             let
                 store @*store
               if
-                action/message-action? $ &list:nth op 0
+                action/message-action? $ &enum:nth op 0
                 let
-                    next-messages $ update-messages (&map:get store :messages) (&list:nth op 0) (&list:nth op 1) op-id op-time
+                    next-messages $ update-messages (&map:get store :messages) (&enum:nth op 0)
+                      if
+                        > (&enum:count op) 1
+                        &enum:nth op 1
+                        {}
+                      , op-id op-time
                   &map:assoc store :messages next-messages
                 match op
                   (:states cursor s)
@@ -326,6 +336,25 @@
             :args $ [] 'Dynamic 'String 'Number
             :features $ #{} :js-ffi
             :return $ :: 'Map 'Dynamic 'Dynamic
+          :tests $ []
+            %{} 'TestEntry (:name |clear-without-payload)
+              :code $ quote $ assert= ({})
+                &map:get
+                  next-store-of (:: action/clear) |id-clear 1
+                  , :messages
+              :tags $ #{} :fast :unit
+            %{} 'TestEntry (:name |create-with-payload)
+              :code $ quote $ assert= |Hello
+                &map:get
+                  &map:get
+                    &map:get
+                      next-store-of
+                        :: action/create $ {} $ :text |Hello
+                        , |id-1 123
+                      , :messages
+                    , |id-1
+                  , :text
+              :tags $ #{} :fast :unit
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
             dispatch! $ :: action/create $ {}
