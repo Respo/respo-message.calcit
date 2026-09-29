@@ -5,11 +5,11 @@
     "compile": "calcit calcit.cirru js",
     "check:unit": "calcit calcit.cirru test --tag unit --require-match --summary-only --format json",
     "check:deprecated": "calcit calcit.cirru analyze deprecated --summary-only --format json",
-    "build": "yarn vite build --base=./",
+    "build": "yarn vite build",
     "dev": "yarn vite"
   },
   "dependencies": {
-    "@calcit/procs": "0.19.1"
+    "@calcit/procs": "0.27.0"
   },
   "devDependencies": {
     "lorem-ipsum": "^2.0.8",
