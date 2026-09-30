@@ -6,11 +6,20 @@ on:
       - main
   pull_request: {}
 
+permissions:
+  contents: read
+
+concurrency:
+  group: cos-${{ github.repository }}-${{ github.event_name == 'pull_request' && 'pr' || github.ref }}
+  cancel-in-progress: false
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
       with:
@@ -25,9 +34,20 @@ jobs:
     - uses: calcit-lang/setup-calcit@ca701be5a471759e442aa053cd100720bbe1f09f # v1.5.0
       with:
         tools: calcit,caps
+        caps-version: "0.1.1"
 
     - name: "install and compile"
-      run: caps --strict --ci && yarn install --immutable && caps deps.cirru verify --toolchain && calcit calcit.cirru --check-only && calcit calcit.cirru js
+      run: |
+        set -euo pipefail
+        test ! -e compact.cirru
+        test ! -e package.cirru
+        caps --strict --ci
+        yarn install --immutable
+        caps verify --toolchain
+        calcit --check-only
+        calcit js
+        calcit analyze check-public --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
+        node --test scripts/demo-regression.test.mjs
 
     - name: "validate Calcit type baseline"
       run: |

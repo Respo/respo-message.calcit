@@ -30,22 +30,24 @@ To mount component and show a message, by default it shows for 4 seconds:
 ```cirru.no-check
 comp-messages (:messages store)
   {} $ :bottom? true
-  fn (info d!) (d! action/remove-one info)
+  fn (info d!) (d! (:: action/remove-one info))
 ```
 
 ```cirru.no-check
-dispatch! action/create $ {}
-  :text $ lorem-ipsum
+dispatch! $ :: action/create $ {}
+  :text |hello
   :token |xxx
 
-dispatch! action/remove-one $ {} (:token |xxx)
+dispatch! $ :: action/remove-one $ {} (:token |xxx)
 ```
 
 Messages can be removed with `:id` or `:token`, where `:token` is what you can generate.
 
-### Calcit 0.13.x
+### Calcit 0.27.0
 
-The project uses the canonical `calcit.cirru` snapshot and Calcit 0.13.64.
+The project uses `calcit.cirru` / `deps.cirru`, Calcit/procs 0.27.0, Node 24,
+Yarn 4.18.0 and Vite 8.3.1. Release 0.0.29 publishes the merged strict
+UI alpha.3 / Respo alpha.5 / js-ffi alpha.4 graph without moving 0.0.28.
 The deprecated `lilac`/`memof` modules have been removed. Message maps use explicit `Option` handling for optional
 fields; new tests use the built-in `calcit.test` support.
 
@@ -62,21 +64,10 @@ yarn check:deprecated
 yarn vite build --base=./
 ```
 
-Sorry but the component gets even harder to setup:
-
-```cirru
-defn dispatch! (op op-data)
-  let
-      op-id $ generate-id!
-      op-time $ js/Date.now
-      store @*store
-    reset! *store $ cond
-        = op :states
-        update store :states $ mutate op-data
-      (action/message-action? op)
-        update store :messages $ \ update-messages % op op-data op-id op-time
-      true $ do (println "|Unhandled operation:" op) store
-```
+Respo event handlers and `dispatch!` receive one Enum. The demo's
+`respo-message.main/next-store-of` extracts the operation tag/payload and calls
+`update-messages` with its existing five-argument API. Keep this boundary when
+integrating; do not call the single-argument dispatcher with separate tag/data.
 
 ### License
 
@@ -85,5 +76,5 @@ MIT
 ### 中文说明
 
 本模块为 Calcit/Respo 应用提供消息组件及对应 updater。项目使用 canonical
-`calcit.cirru`，Calcit 与 `@calcit/procs` 保持 0.13.64 lockstep，并固定
+`calcit.cirru`，Calcit 与 `@calcit/procs` 保持 0.27.0 lockstep，并固定
 到已发布的 Respo UI tag。
