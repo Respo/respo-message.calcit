@@ -76,11 +76,12 @@
                       :on-click $ fn (e d!)
                         let
                             new-token $ generate-id!
-                          d! action/create $ &merge schema/message $ {} (:token new-token)
-                            :text $ lorem-ipsum/loremIpsum
-                          js/setTimeout
+                          d! $ :: action/create $ &merge schema/message
+                            {} (:token new-token)
+                              :text $ lorem-ipsum/loremIpsum
+                          browser/set-timeout!
                             fn ()
-                              d! action/remove-one $ {} $ :token new-token
+                              d! $ :: action/remove-one $ {} (:token new-token)
                               , &unit
                             , 2000
                           , &unit
@@ -88,11 +89,13 @@
                   =< 16 nil
                   button
                     {} (:class-name css/button)
-                      :on-click $ fn (e d!) (d! action/clear nil)
+                      :on-click $ fn (e d!)
+                        d! $ :: action/clear
                     <> |Clear
                 comp-messages messages
                   {} $ :bottom? false
-                  fn (info d!) (d! action/remove-one info)
+                  fn (info d!)
+                    d! $ :: action/remove-one info
                 when config/dev? $ comp-inspect |messages messages nil
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
@@ -112,6 +115,7 @@
             respo-message.action :as action
             respo.comp.inspect :refer $ comp-inspect
             respo-message.config :as config
+            js-ffi.browser :as browser
     'respo-message.comp.message $ %{} 'FileEntry
       :defs $ {}
         'comp-message $ %{} 'CodeEntry (:doc |)
