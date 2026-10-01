@@ -16,16 +16,14 @@
           :examples $ []
             quote $ assert= true $ tag? respo-message.action/clear
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/clear
-          :schema $ :: 'Fn $ {} (:return 'Dynamic)
-            :args $ [] (:: 'Map 'Dynamic 'Dynamic) 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+          :schema $ :: 'Tag
         'create $ %{} 'CodeEntry
           :doc "|Action tag for creating a new message. Use it with dispatch! to display a toast message."
           :code $ quote $ def create (gen-tag |message/create)
           :examples $ []
             quote $ assert= true $ tag? respo-message.action/create
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/create
-          :schema $ :: 'Fn $ {} (:return 'Dynamic)
-            :args $ [] (:: 'Map 'Dynamic 'Dynamic) 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+          :schema $ :: 'Tag
         'dict $ %{} 'CodeEntry
           :doc "|Dictionary of all message action tags. Useful for pattern matching and validation."
           :code $ quote $ def dict
@@ -33,13 +31,13 @@
           :examples $ []
             quote $ assert= true $ option:some? (get respo-message.action/dict :create)
             quote $ assert= 3 $ count respo-message.action/dict
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Map 'Tag 'Tag
         'gen-tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn gen-tag (x)
             turn-tag $ str x |_GEN_ 0
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Tag)
-            :args $ [] 'Dynamic
+            :args $ [] 'String
         'message-action? $ %{} 'CodeEntry
           :doc "|Predicate function to check if an operation is a message action. Returns true for create, clear, and remove-one actions."
           :code $ quote $ defn message-action? (op)
@@ -55,8 +53,7 @@
           :examples $ []
             quote $ assert= true $ tag? respo-message.action/remove-one
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/remove-one
-          :schema $ :: 'Fn $ {} (:return 'Dynamic)
-            :args $ [] (:: 'Map 'Dynamic 'Dynamic) 'Dynamic 'Dynamic 'Dynamic 'Dynamic
+          :schema $ :: 'Tag
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.action
     'respo-message.comp.container $ %{} 'FileEntry
