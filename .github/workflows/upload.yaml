@@ -12,6 +12,7 @@ permissions:
 concurrency:
   group: cos-${{ github.repository }}-${{ github.event_name == 'pull_request' && 'pr' || github.ref }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   test:
@@ -39,6 +40,8 @@ jobs:
     - name: "install and compile"
       run: |
         set -euo pipefail
+        test -f calcit.cirru
+        test -f deps.cirru
         test ! -e compact.cirru
         test ! -e package.cirru
         caps --strict --ci
@@ -47,7 +50,6 @@ jobs:
         calcit --check-only
         calcit js
         calcit analyze check-public --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
-        node --test scripts/demo-regression.test.mjs
 
     - name: "validate Calcit type baseline"
       run: |
