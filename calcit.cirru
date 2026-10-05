@@ -253,20 +253,24 @@
           :schema $ :: 'Fn $ {} (:return 'Bool)
             :args $ []
             :features $ #{} :js-ffi
-        'dev? $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def dev?
+        'detect-dev? $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn detect-dev? ()
             let
                 debug? false
               cond
                   exists? js/window
                   , debug?
                 (exists? js/process)
-                  not= |true $ unsafe-coerce js/process.env.release String
+                  not $ &= |true js/process.env.release
                 true true
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Dynamic)
+          :schema $ :: 'Fn $ {} (:return 'Bool)
             :args $ []
             :features $ #{} :js-ffi
+        'dev? $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def dev? (detect-dev?)
+          :examples $ []
+          :schema $ :: 'Bool
         'site $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def site
             {} (:dev-ui |http://localhost:8100/main-fonts.css) (:release-ui |http://cdn.tiye.me/favored-fonts/main-fonts.css) (:cdn-url |http://cdn.tiye.me/respo-message/) (:title |Message) (:icon |http://cdn.tiye.me/logo/respo.png) (:storage-key |respo-message)

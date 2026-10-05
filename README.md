@@ -78,3 +78,13 @@ MIT
 本模块为 Calcit/Respo 应用提供消息组件及对应 updater。项目使用 canonical
 `calcit.cirru`，Calcit 与 `@calcit/procs` 保持 0.27.0 lockstep，并固定
 到已发布的 Respo UI tag。
+
+Demo 前端资源使用正式 COS action v1.2.0，通过 `public-base-url` 启用内置逐文件
+校验，不另加上传验证脚本。PR CDN 路径按 PR/run/attempt 隔离，同一 PR 或生产
+分支任务排队执行；生产 COS 前缀和网页 rsync 路径不变。
+本次部署改进保留上述 Calcit 0.27.0 发布图，不代表共享模块的 0.28 类型迁移已经完成。
+
+`dev?` 明确声明为 Bool，环境探测集中在返回 Bool 的 `detect-dev?` FFI 边界，
+不再把布尔值声明为函数或在值初始化中使用 `unsafe-coerce`。保留浏览器关闭调试、
+Node 仅在 `release=true` 时关闭调试的原行为；已有类型预算收紧到当前实测值，
+不新增测试或验证脚本。
