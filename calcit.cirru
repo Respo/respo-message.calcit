@@ -165,7 +165,7 @@
           :code $ quote $ defeffect effect-fade (message idx bottom?) (action el *local)
             let
                 dy $ if bottom? 0 $ * idx 40
-              case-default action nil
+              match action
                 :mount $ let
                     element $ unsafe-coerce el 'js-ffi.browser/DomElementHost
                   browser/element-set-style! element |transform $ str "|translate(60px," dy "|px)"
@@ -189,6 +189,7 @@
                   browser/set-timeout!
                     fn () $ cloned .remove!
                     , 400
+                _ nil
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Dynamic)
             :args $ [] 'Dynamic 'Dynamic 'Dynamic
@@ -213,7 +214,7 @@
                 {} $ :style $ if bottom?
                   {} (:position :fixed) (:bottom 0) (:right 0)
                   {} (:position :fixed) (:top 0) (:right 0)
-                -> messages (vals) (&set:to-list)
+                -> messages (distinct-values) (&set:to-list)
                   sort $ fn (message m)
                     -
                       or (&map:get m :time) 0
@@ -299,7 +300,7 @@
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
             render-app! render!
-            add-watch *store :changes $ fn (store prev) (render-app! render!)
+            add-watch! *store :changes $ fn (store prev) (render-app! render!)
             browser/set-timeout!
               fn () $ dispatch! $ :: action/create
                 {} $ :text $ lorem-ipsum/loremIpsum
@@ -428,7 +429,7 @@
                 let
                     token $ or (&map:get op-data :token) nil
                     message-id $ or (&map:get op-data :id) nil
-                  if (some? token)
+                  if (non-nil? token)
                     -> messages (to-pairs)
                       filter $ fn (pair)
                         let[] (k message) pair $ not $ &= token
