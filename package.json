@@ -9,7 +9,7 @@
     "dev": "yarn vite"
   },
   "dependencies": {
-    "@calcit/procs": "0.29.0-alpha.17"
+    "@calcit/procs": "0.29.0-alpha.18"
   },
   "devDependencies": {
     "lorem-ipsum": "^2.0.8",
