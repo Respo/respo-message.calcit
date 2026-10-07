@@ -292,6 +292,7 @@
                 op-id $ generate-id!
                 op-time $ shared/now-ms
               reset! *store $ next-store-of op op-id op-time
+              , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'Dynamic
