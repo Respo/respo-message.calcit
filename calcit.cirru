@@ -61,7 +61,9 @@
         %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-container (store)
             let
-                messages $ or (&map:get store :messages) ({})
+                messages $ decode-map-as
+                  or (&map:get store :messages) ({})
+                  :: 'Map 'String 'Dynamic
               div
                 {}
                   :class-name $ str-spaced css/global css/fullscreen
@@ -338,6 +340,7 @@
                 op-id $ generate-id!
                 op-time $ shared/now-ms
               reset! *store $ next-store-of op op-id op-time
+              , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'Dynamic
