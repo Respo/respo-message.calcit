@@ -61,7 +61,9 @@
         %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-container (store)
             let
-                messages $ or (&map:get store :messages) ({})
+                messages $ decode-map-as
+                  or (&map:get store :messages) ({})
+                  :: 'Map 'String 'Dynamic
               div
                 {}
                   :class-name $ str-spaced css/global css/fullscreen
@@ -118,12 +120,12 @@
         'comp-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-message (idx message options on-remove!)
             let
-                bottom? $ or (&map:get options :bottom?) false
-                message-style $ or (&map:get message :style) ({})
+                bottom? $ = true $ &map:get options :bottom?
+                message-style $ message-style-of message
                 message-id $ or (&map:get message :id) nil
                 message-token $ or (&map:get message :token) nil
-                message-time $ or (&map:get message :time) 0
-                message-text $ or (&map:get message :text) ||
+                message-time $ message-time message
+                message-text $ message-text-of message
               [] (effect-fade message idx bottom?)
                 div
                   {} (:class-name css-message)
@@ -164,7 +166,7 @@
         'effect-fade $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defeffect effect-fade (message idx bottom?) (action el *local)
             let
-                dy $ if bottom? 0 $ * idx 40
+                dy $ if (= true bottom?) 0 $ if (number? idx) (* idx 40) 0
               match action
                 :mount $ let
                     element $ unsafe-coerce el 'js-ffi.browser/DomElementHost
@@ -194,6 +196,24 @@
           :schema $ :: 'Fn $ {} (:return 'Dynamic)
             :args $ [] 'Dynamic 'Dynamic 'Dynamic
             :features $ #{} :js-ffi
+        'message-style-of $ %{} 'CodeEntry (:doc "|读取消息样式并校验为 map。")
+          :code $ quote $ defn message-style-of (message)
+            &let
+              style $ &map:get message :style
+              if (nil? style) ({})
+                if (map? style) style $ raise "|respo-message expected :style as a map"
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ [] $ :: 'Map 'Dynamic 'Dynamic
+            :return $ :: 'Map 'Dynamic 'Dynamic
+        'message-text-of $ %{} 'CodeEntry (:doc "|读取消息文本，非字符串值按显示文本转换。")
+          :code $ quote $ defn message-text-of (message)
+            &let
+              text $ &map:get message :text
+              if (string? text) text $ if (nil? text) | $ str text
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'String)
+            :args $ [] $ :: 'Map 'Dynamic 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.message
           :require
@@ -204,22 +224,25 @@
             respo.css :refer $ defstyle
             js-ffi.browser :as browser
     'respo-message.comp.messages $ %{} 'FileEntry
-      :defs $ {} $ 'comp-messages
-        %{} 'CodeEntry
+      :defs $ {}
+        'comp-messages $ %{} 'CodeEntry
           :doc "|Respo component that renders a list of toast messages. Pass messages map, options (with :bottom? flag for positioning), and on-remove! callback. Messages are auto-sorted by time (newest first) and rendered at fixed position (top-right or bottom-right)."
           :code $ quote $ defcomp comp-messages (messages options on-remove!)
             let
-                bottom? $ or (&map:get options :bottom?) false
+                bottom? $ = true $ &map:get options :bottom?
               list->
                 {} $ :style $ if bottom?
                   {} (:position :fixed) (:bottom 0) (:right 0)
                   {} (:position :fixed) (:top 0) (:right 0)
-                -> messages (distinct-values) (&set:to-list)
+                -> (message-entries messages)
                   sort $ fn (message m)
-                    -
-                      or (&map:get m :time) 0
-                      or (&map:get message :time) 0
+                    hint-fn $ {} (:return 'Number)
+                      :args $ [] (:: 'Map 'Dynamic 'Dynamic) (:: 'Map 'Dynamic 'Dynamic)
+                    - (message-time m) (message-time message)
                   map-indexed $ fn (idx message)
+                    hint-fn $ {}
+                      :args $ [] 'Number $ :: 'Map 'Dynamic 'Dynamic
+                      :return $ :: 'List 'Dynamic
                     []
                       or (&map:get message :id) |
                       comp-message idx message options on-remove!
@@ -232,6 +255,31 @@
               fn (info) nil
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] (:: 'Map 'String 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
+        'message-entries $ %{} 'CodeEntry (:doc "|去重并校验消息条目为 map。")
+          :code $ quote $ defn message-entries (messages)
+            foldl
+              &set:to-list $ distinct-values messages
+              []
+              defn %message-entry (acc message)
+                hint-fn $ {}
+                  :args $ []
+                    :: 'List $ :: 'Map 'Dynamic 'Dynamic
+                    , 'Dynamic
+                  :return $ :: 'List $ :: 'Map 'Dynamic 'Dynamic
+                if (map? message) (append acc message)
+                  raise $ str "|respo-message expected each message as a map, got: " $ type-of message
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ [] $ :: 'Map 'String 'Dynamic
+            :return $ :: 'List $ :: 'Map 'Dynamic 'Dynamic
+        'message-time $ %{} 'CodeEntry (:doc "|读取消息时间用于排序，缺失或非数字时为 0。")
+          :code $ quote $ defn message-time (message)
+            &let
+              t $ &map:get message :time
+              if (number? t) t 0
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'Number)
+            :args $ [] $ :: 'Map 'Dynamic 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.messages
           :require
