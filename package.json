@@ -6,7 +6,8 @@
     "check:unit": "calcit calcit.cirru test --tag unit --require-match --summary-only --format json",
     "check:deprecated": "calcit calcit.cirru analyze deprecated --summary-only --format json",
     "build": "yarn vite build",
-    "dev": "yarn vite"
+    "dev": "yarn vite",
+    "check:render": "node check-message-render.mjs"
   },
   "dependencies": {
     "@calcit/procs": "0.29.0-alpha.19"

@@ -5,6 +5,13 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
+### 渲染回归检查
+
+`yarn check:render` 从当前 Snapshot 临时生成 JavaScript，实际渲染缺失时间、
+数字时间和旧格式非法时间的消息。检查保留原有时间回退为 `0` 的行为，
+防止时间读取函数与局部变量同名时产生 JavaScript 初始化顺序异常。
+临时 Snapshot 和生成代码位于 `.calcit/`，执行后自动清理。
+
 ### Usages
 
 Public APIs:
