@@ -66,6 +66,9 @@ jobs:
     - name: "run unit tests"
       run: yarn check:unit
 
+    - name: "check generated JavaScript message rendering"
+      run: yarn check:render
+
     - name: "check deprecated APIs"
       run: yarn check:deprecated
 

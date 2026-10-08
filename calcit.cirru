@@ -124,7 +124,7 @@
                 message-style $ message-style-of message
                 message-id $ or (&map:get message :id) nil
                 message-token $ or (&map:get message :token) nil
-                message-time $ message-time message
+                message-timestamp $ message-time message
                 message-text $ message-text-of message
               [] (effect-fade message idx bottom?)
                 div
@@ -137,7 +137,7 @@
                         :transform $ str "|translate(0," (* idx 40) "|px)"
                     :on-click $ fn (e d!)
                       on-remove!
-                        {} (:id message-id) (:token message-token) (:index idx) (:time message-time)
+                        {} (:id message-id) (:token message-token) (:index idx) (:time message-timestamp)
                         , d!
                   <> message-text nil
           :examples $ []
@@ -223,6 +223,7 @@
             respo-message.schema :as schema
             respo.css :refer $ defstyle
             js-ffi.browser :as browser
+            respo-message.comp.messages :refer $ message-time
     'respo-message.comp.messages $ %{} 'FileEntry
       :defs $ {}
         'comp-messages $ %{} 'CodeEntry
