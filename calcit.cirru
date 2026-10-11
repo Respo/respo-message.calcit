@@ -3,7 +3,7 @@
   :about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `calcit query` to inspect and `calcit edit`/`calcit tree` to modify. Run `calcit docs agents --contract` before mutations; use `--full` for first orientation or changed contract digest. Manual edits must follow format and schema conventions, then run `calcit edit format`."
   :package |respo-message
   :entries $ {} $ :default
-    {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :native) (:reload-fn 'respo-message.main/reload!) (:target :browser)
+    {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :js) (:reload-fn 'respo-message.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |js-ffi/
       :type-slots $ {}
@@ -344,7 +344,7 @@
               , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Dynamic
+            :args $ [] 'Enum
             :features $ #{} :js-ffi
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
@@ -389,7 +389,7 @@
                   _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
           :schema $ :: 'Fn $ {}
-            :args $ [] 'Dynamic 'String 'Number
+            :args $ [] 'Enum 'String 'Number
             :features $ #{} :js-ffi
             :return $ :: 'Map 'Dynamic 'Dynamic
           :tests $ []

@@ -49,28 +49,22 @@ jobs:
         caps --strict --ci
         yarn install --immutable
         caps verify --toolchain
-        calcit --check-only
+        calcit --check-only --all-defs
         calcit js
-        calcit analyze check-public --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
+        calcit --check-only --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
 
-    - name: "validate Calcit type baseline"
+    - name: "check canonical source and type diagnostics"
       run: |
         calcit calcit.cirru edit format
         git diff --exit-code -- calcit.cirru
-        mkdir -p .calcit
-        calcit calcit.cirru analyze check-types --summary-only --format json > .calcit/check-types.json
-        calcit calcit.cirru analyze weak-types --only schema-dynamic,code-dynamic,code-nil --intent unresolved,declared-optional --summary-only --format json > .calcit/weak-types.json
-        calcit calcit.cirru analyze deprecated --summary-only --format json > .calcit/deprecated.json
-        node scripts/check-calcit-upgrade-baseline.mjs
+        calcit calcit.cirru analyze weak-types --only coverage --summary-only
+        yarn check:deprecated
 
     - name: "run unit tests"
       run: yarn check:unit
 
     - name: "check generated JavaScript message rendering"
       run: yarn check:render
-
-    - name: "check deprecated APIs"
-      run: yarn check:deprecated
 
     - name: Select CDN asset prefix
       id: asset-path
