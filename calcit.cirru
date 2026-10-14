@@ -98,7 +98,7 @@
                 when config/dev? $ comp-inspect |messages messages nil
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
-            :args $ [] 'Dynamic
+            :args $ [] $ :: 'Map 'Dynamic 'Dynamic
             :features $ #{} :js-ffi
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.container
@@ -356,17 +356,16 @@
                 {} $ :text $ lorem-ipsum/loremIpsum
               , 0
             println "|app started!"
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
             :features $ #{} :js-ffi
         'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn mount-target ()
-            unsafe-coerce
-              option:unwrap $ browser/query-selector |.app
-              , 'Dynamic
+            .unwrap $ dom/query-selector |.app
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Dynamic)
+          :schema $ :: 'Fn $ {} (:return 'respo.dom/DomElement)
             :args $ []
             :features $ #{} :js-ffi
         'next-store-of $ %{} 'CodeEntry (:doc |)
@@ -376,7 +375,9 @@
               if
                 action/message-action? $ &enum:nth op 0
                 let
-                    next-messages $ update-messages (&map:get store :messages) (&enum:nth op 0)
+                    next-messages $ update-messages
+                      decode-map-as (&map:get store :messages) (:: 'Map 'Dynamic 'Dynamic)
+                      &enum:nth op 0
                       if
                         > (&enum:count op) 1
                         &enum:nth op 1
@@ -385,7 +386,11 @@
                   &map:assoc store :messages next-messages
                 match op
                   (:states cursor s)
-                    assert-type (update-states store cursor s) (:: 'Map 'Dynamic 'Dynamic)
+                    decode-map-as
+                      update-states store
+                        decode-map-as cursor $ :: 'List 'Dynamic
+                        , s
+                      :: 'Map 'Dynamic 'Dynamic
                   _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
           :schema $ :: 'Fn $ {}
@@ -420,10 +425,16 @@
             :args $ []
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! (renderer)
-            renderer (mount-target) (comp-container @*store) dispatch!
+            renderer (mount-target) (comp-container @*store)
+              fn (op)
+                if (enum? op) (dispatch! op) (raise |Expected-message-operation-enum)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Fn
+            :args $ [] $ :: 'Fn
+              {} (:return 'Unit)
+                :args $ [] (:: 'JsNullish 'respo.dom/DomElement) 'respo.schema/Component $ :: 'Fn
+                  {} (:return 'Unit)
+                    :args $ [] 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.main
           :require
@@ -438,6 +449,7 @@
             respo-message.config :as config
             js-ffi.browser :as browser
             js-ffi.shared :as shared
+            respo.ffi.browser :as dom
     'respo-message.schema $ %{} 'FileEntry
       :defs $ {}
         'message $ %{} 'CodeEntry
@@ -473,17 +485,23 @@
                 &= op action/clear
                 {}
               (&= op action/create)
-                &map:assoc messages op-id $ &merge (&merge schema/message op-data)
+                &map:assoc messages op-id $ &merge
+                  &merge schema/message $ decode-map-as op-data $ :: 'Map 'Tag 'Dynamic
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
                 let
-                    token $ or (&map:get op-data :token) nil
-                    message-id $ or (&map:get op-data :id) nil
+                    data $ decode-map-as op-data $ :: 'Map 'Dynamic 'Dynamic
+                    token $ or (&map:get data :token) nil
+                    message-id $ or (&map:get data :id) nil
                   if (non-nil? token)
                     -> messages (to-pairs)
                       filter $ fn (pair)
                         let[] (k message) pair $ not $ &= token
-                          or (&map:get message :token) nil
+                          or
+                            &map:get
+                              decode-map-as message $ :: 'Map 'Dynamic 'Dynamic
+                              , :token
+                            , nil
                       &set:to-list
                       pairs-map
                     &map:dissoc messages message-id
