@@ -34,7 +34,7 @@
           :schema $ :: 'Map 'Tag 'Tag
         'gen-tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn gen-tag (x)
-            turn-tag $ str x |_GEN_ 0
+            to-tag $ str x |_GEN_ 0
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Tag)
             :args $ [] 'String
@@ -62,7 +62,9 @@
           :code $ quote $ defcomp comp-container (store)
             let
                 messages $ decode-map-as
-                  or (&map:get store :messages) ({})
+                  or
+                    .unwrap-or (get store :messages) nil
+                    {}
                   :: 'Map 'String 'Dynamic
               div
                 {}
@@ -120,10 +122,14 @@
         'comp-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-message (idx message options on-remove!)
             let
-                bottom? $ = true $ &map:get options :bottom?
+                bottom? $ = true $ .unwrap-or (get options :bottom?) nil
                 message-style $ message-style-of message
-                message-id $ or (&map:get message :id) nil
-                message-token $ or (&map:get message :token) nil
+                message-id $ or
+                  .unwrap-or (get message :id) nil
+                  , nil
+                message-token $ or
+                  .unwrap-or (get message :token) nil
+                  , nil
                 message-timestamp $ message-time message
                 message-text $ message-text-of message
               [] (effect-fade message idx bottom?)
@@ -199,7 +205,7 @@
         'message-style-of $ %{} 'CodeEntry (:doc "|读取消息样式并校验为 map。")
           :code $ quote $ defn message-style-of (message)
             &let
-              style $ &map:get message :style
+              style $ .unwrap-or (get message :style) nil
               if (nil? style) ({})
                 if (map? style) style $ raise "|respo-message expected :style as a map"
           :examples $ []
@@ -209,7 +215,7 @@
         'message-text-of $ %{} 'CodeEntry (:doc "|读取消息文本，非字符串值按显示文本转换。")
           :code $ quote $ defn message-text-of (message)
             &let
-              text $ &map:get message :text
+              text $ .unwrap-or (get message :text) nil
               if (string? text) text $ if (nil? text) | $ str text
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'String)
@@ -230,7 +236,7 @@
           :doc "|Respo component that renders a list of toast messages. Pass messages map, options (with :bottom? flag for positioning), and on-remove! callback. Messages are auto-sorted by time (newest first) and rendered at fixed position (top-right or bottom-right)."
           :code $ quote $ defcomp comp-messages (messages options on-remove!)
             let
-                bottom? $ = true $ &map:get options :bottom?
+                bottom? $ = true $ .unwrap-or (get options :bottom?) nil
               list->
                 {} $ :style $ if bottom?
                   {} (:position :fixed) (:bottom 0) (:right 0)
@@ -245,7 +251,9 @@
                       :args $ [] 'Number $ :: 'Map 'Dynamic 'Dynamic
                       :return $ :: 'List 'Dynamic
                     []
-                      or (&map:get message :id) |
+                      or
+                        .unwrap-or (get message :id) nil
+                        , |
                       comp-message idx message options on-remove!
           :examples $ []
             quote $ respo-message.comp.messages/comp-messages ({})
@@ -276,7 +284,7 @@
         'message-time $ %{} 'CodeEntry (:doc "|读取消息时间用于排序，缺失或非数字时为 0。")
           :code $ quote $ defn message-time (message)
             &let
-              t $ &map:get message :time
+              t $ .unwrap-or (get message :time) nil
               if (number? t) t 0
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Number)
@@ -376,7 +384,9 @@
                 action/message-action? $ &enum:nth op 0
                 let
                     next-messages $ update-messages
-                      decode-map-as (&map:get store :messages) (:: 'Map 'Dynamic 'Dynamic)
+                      decode-map-as
+                        .unwrap-or (get store :messages) nil
+                        :: 'Map 'Dynamic 'Dynamic
                       &enum:nth op 0
                       if
                         > (&enum:count op) 1
@@ -400,21 +410,17 @@
           :tests $ []
             %{} 'TestEntry (:name |clear-without-payload)
               :code $ quote $ assert= ({})
-                &map:get
+                .unwrap $ get
                   next-store-of (:: action/clear) |id-clear 1
                   , :messages
               :tags $ #{} :fast :unit
             %{} 'TestEntry (:name |create-with-payload)
               :code $ quote $ assert= |Hello
-                &map:get
-                  &map:get
-                    &map:get
-                      next-store-of
-                        :: action/create $ {} $ :text |Hello
-                        , |id-1 123
-                      , :messages
-                    , |id-1
-                  , :text
+                .unwrap $ get-in
+                  next-store-of
+                    :: action/create $ {} $ :text |Hello
+                    , |id-1 123
+                  [] :messages |id-1 :text
               :tags $ #{} :fast :unit
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
@@ -491,16 +497,22 @@
               (&= op action/remove-one)
                 let
                     data $ decode-map-as op-data $ :: 'Map 'Dynamic 'Dynamic
-                    token $ or (&map:get data :token) nil
-                    message-id $ or (&map:get data :id) nil
+                    token $ or
+                      .unwrap-or (get data :token) nil
+                      , nil
+                    message-id $ or
+                      .unwrap-or (get data :id) nil
+                      , nil
                   if (non-nil? token)
                     -> messages (to-pairs)
                       filter $ fn (pair)
                         let[] (k message) pair $ not $ &= token
                           or
-                            &map:get
-                              decode-map-as message $ :: 'Map 'Dynamic 'Dynamic
-                              , :token
+                            .unwrap-or
+                              get
+                                decode-map-as message $ :: 'Map 'Dynamic 'Dynamic
+                                , :token
+                              , nil
                             , nil
                       &set:to-list
                       pairs-map
