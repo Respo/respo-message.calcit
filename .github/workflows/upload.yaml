@@ -50,6 +50,7 @@ jobs:
         yarn install --immutable
         caps verify --toolchain
         calcit --check-only --all-defs
+        calcit fix --workflow strict --verify
         calcit js
         calcit --check-only --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
 

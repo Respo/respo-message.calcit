@@ -1,5 +1,5 @@
 {
-  "version": "0.0.36",
+  "version": "0.0.37",
   "packageManager": "yarn@4.18.0",
   "scripts": {
     "compile": "calcit calcit.cirru js",
@@ -10,7 +10,7 @@
     "check:render": "node check-message-render.mjs"
   },
   "dependencies": {
-    "@calcit/procs": "0.30.0"
+    "@calcit/procs": "0.30.1-alpha.4"
   },
   "devDependencies": {
     "lorem-ipsum": "^2.0.8",
