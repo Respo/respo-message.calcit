@@ -51,6 +51,15 @@ Messages can be removed with `:id` or `:token`, where `:token` is what you can g
 
 ### 发布工具链
 
+`0.0.37` 使用者注意：本版本配对已发布的 Calcit CLI / `@calcit/procs`
+`0.30.1-alpha.4`，不是稳定 0.30.1 已发布的声明。依赖使用正式模块 UI `0.7.41`、
+Respo `0.16.122`、JS-FFI `0.2.3`，传递 Router `0.8.36`，与 Recollect `0.0.62`
+的依赖图对齐。还在正式 0.30.0 的消费者应保留 `0.0.36`，不要混用两套图。
+当前仅更新工具链/依赖配对，模块 Snapshot、原测试、消息 API、数据格式和部署
+路径不变，不新增迁移适配层、验证脚本或预算。当前门禁含完整 strict/preflight。
+
+#### 0.30.0 历史迁移记录
+
 `0.0.36` 使用者影响：UI 升级为正式 `0.7.40`，与 Reel `0.6.38` 对齐，
 避免 Caps strict 拒绝混用旧 UI `0.7.39`；传递依赖 Router 为 `0.8.35`。
 Calcit/procs 仍为正式 `0.30.0`，模块 Snapshot、消息 API、数据格式与部署路径
@@ -82,6 +91,7 @@ caps --ci --strict
 caps verify --toolchain
 yarn install --immutable
 calcit calcit.cirru --check-only --all-defs
+calcit fix --workflow strict --verify
 calcit calcit.cirru --check-only --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
 calcit calcit.cirru analyze weak-types --only coverage --summary-only
 calcit calcit.cirru js
@@ -105,8 +115,8 @@ MIT
 ### 中文说明
 
 本模块为 Calcit/Respo 应用提供消息组件及对应 updater。项目使用 canonical
-`calcit.cirru`，Calcit 与 `@calcit/procs` 保持正式 0.30.0 lockstep，并固定
-到已发布的 Respo UI tag。
+`calcit.cirru`，Calcit 与 `@calcit/procs` 按上文保持精确配对，并固定到已发布的
+Respo UI tag；CLI/runtime 当前是显式选用的 0.30.1-alpha.4，不称为稳定版。
 
 Demo 前端资源使用正式 COS action v1.2.0，通过 `public-base-url` 启用内置逐文件
 校验，不另加上传验证脚本。PR CDN 路径按 PR/run/attempt 隔离，同一 PR 或生产
