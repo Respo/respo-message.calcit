@@ -51,14 +51,19 @@ Messages can be removed with `:id` or `:token`, where `:token` is what you can g
 
 ### 发布工具链
 
+`0.0.36` 使用者影响：UI 升级为正式 `0.7.40`，与 Reel `0.6.38` 对齐，
+避免 Caps strict 拒绝混用旧 UI `0.7.39`；传递依赖 Router 为 `0.8.35`。
+Calcit/procs 仍为正式 `0.30.0`，模块 Snapshot、消息 API、数据格式与部署路径
+均不修改。以下 `0.0.35` 段落保留上次迁移的历史验证范围。
+
 使用者影响：候选 `0.0.35` 配对正式 Calcit / `@calcit/procs` `0.30.0`，消费者需同步应用工具链。继续使用已发布的正式 UI 依赖图。创建消息的 payload 明确检查为 Tag key 的 Map；`:text`、`:token`、`:style` 等既有字段和任意附加 Tag 字段保留，非法 payload 提前报错，不依靠合并原语间接失败。旧消息缺失/非法时间回退为 `0`、按 token/id 删除及清空行为不变。消息值仍允许异构数据，不宣称整个模型已完全类型化。
 
 demo 的挂载点改用 Respo 自带的 `query-selector`，保留缺失节点时 unwrap 抛错的行为及宿主元素身份，不在应用中强转两个库的 DOM trait。renderer 使用准确回调契约，开放 dispatch 边界只接受实际 Enum；`:states` 的 cursor 和返回 store 使用实际 Map/List 检查而非类型断言。
 
 项目使用 `calcit.cirru` / `deps.cirru`，CLI 与 `@calcit/procs` 固定为
 已发布的 `0.30.0`，Node 24、Yarn 4.18.0 和 Vite 8.3.1。
-当前准备 `0.0.35`，使用正式 UI `0.7.39`、Respo `0.16.120`、JS-FFI `0.2.3`，
-传递依赖 Router `0.8.34`；合并提交的 CI 通过后再发布标签供下游使用。
+`0.0.35` 使用正式 UI `0.7.39`、Respo `0.16.120`、JS-FFI `0.2.3`，
+传递依赖 Router `0.8.34`；当前 `0.0.36` 的依赖升级见上文。
 `lilac`/`memof` 已移除，消息 Map 的可选字段仍由显式 Option 处理。
 既有单元测试使用内置 `calcit.test`。重复的类型预算脚本和配置已移除，
 以严格检查作为正确性门禁；`weak-types` 仅提供覆盖率与旧 API 诊断，不冒充强制预算。
