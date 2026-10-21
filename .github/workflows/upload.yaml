@@ -50,9 +50,9 @@ jobs:
         yarn install --immutable
         caps verify --toolchain
         calcit --check-only --all-defs
-        calcit fix --workflow strict --verify
+        calcit fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status == "passed" and .diagnostics == [] then true else ., false end'
         calcit js
-        calcit --check-only --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
+        calcit --check-only --ns 'respo-message.$meta' --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
 
     - name: "check canonical source and type diagnostics"
       run: |

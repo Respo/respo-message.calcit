@@ -10,7 +10,8 @@ Demo http://repo.respo-mvc.org/message.calcit/
 `yarn check:render` 从当前 Snapshot 临时生成 JavaScript，实际渲染缺失时间、
 数字时间和旧格式非法时间的消息。检查保留原有时间回退为 `0` 的行为，
 防止时间读取函数与局部变量同名时产生 JavaScript 初始化顺序异常。
-临时 Snapshot 和生成代码位于 `.calcit/`，执行后自动清理。
+仅生成代码位于 `.calcit/`，执行后自动清理。直接使用编译器已生成的真实 renderer，
+不再复制或改写 Snapshot、注入测试 helper，也不修改 reload 入口。
 
 ### Usages
 
@@ -51,12 +52,36 @@ Messages can be removed with `:id` or `:token`, where `:token` is what you can g
 
 ### 发布工具链
 
-`0.0.37` 使用者注意：本版本配对已发布的 Calcit CLI / `@calcit/procs`
-`0.30.1-alpha.4`，不是稳定 0.30.1 已发布的声明。依赖使用正式模块 UI `0.7.41`、
-Respo `0.16.122`、JS-FFI `0.2.3`，传递 Router `0.8.36`，与 Recollect `0.0.62`
-的依赖图对齐。还在正式 0.30.0 的消费者应保留 `0.0.36`，不要混用两套图。
-当前仅更新工具链/依赖配对，模块 Snapshot、原测试、消息 API、数据格式和部署
-路径不变，不新增迁移适配层、验证脚本或预算。当前门禁含完整 strict/preflight。
+`0.0.38` 候选使用者注意：CLI / `@calcit/procs` 成对固定为正式 `0.30.1`，
+依赖使用已发布 UI `0.8.0`、Respo `0.16.124`、JS-FFI `0.2.5`，传递 Router `0.8.37`。
+应用中的其他模块也必须请求一致的正式图；不要只改根版本、混用旧 alpha 图或放宽
+Caps strict。继续使用 Respo 0.16 兼容接口，不切换 0.17 的破坏性 dispatch API。
+UI 0.8 的基础样式更新会随依赖带入，Demo 按钮外观可能与 UI 0.7 不同；
+本模块没有额外改写消息 CSS。
+
+消息 Map、id/token 删除、缺失/非法时间回退与正常动画时序不变。淡入淡出效果将三处
+DOM 强转替换为 JS-FFI 已有的 `element-host` 运行时检查：非法宿主或缺失父元素会
+明确抛错，不静默跳过。效果工厂的返回值明确为 `respo.schema/Effect`，参数是泛型
+消息身份值、Number 索引与 Bool 方向；公共组件已有的索引/方向行为不改。
+
+原 4 项 unit 和 3 类时间值 JS 渲染断言保留，不新增防御性测试表、迁移适配层、
+验证脚本或预算。JS 回归只编译 canonical Snapshot，不再为暴露 renderer 临时改写
+Snapshot。完整 strict/preflight 和原 COS 内置校验保留，部署路径不变。
+局部不再直接使用 unsafe，不代表开放消息 Map、回调与框架 FFI 边界已全部类型化。
+
+正式配对已在 [Linux CI](https://github.com/Respo/respo-message.calcit/actions/runs/39575511496)
+通过自身 Caps strict 图、不可变 Yarn、完整 strict、全定义 181/181、公开定义 32/32、
+原 unit 4/4 及三类时间值 JS 渲染。该精确公开构建的真实 Demo 通过初始消息、Try、
+点击移除、Clear、多消息、自动消失和刷新回归，console warning/error 为空。
+长消息视觉截断在原 0.0.37 同环境中也复现，单独记录为
+[#53](https://github.com/Respo/respo-message.calcit/issues/53)，不是本次 DOM 类型改动的修复项。
+上述不替代真实下游项目的发布图集成；当前仍为未合并、未部署、未发布的候选。
+
+#### 0.30.1-alpha.4 历史记录
+
+`0.0.37` 使用 CLI/runtime `0.30.1-alpha.4`、UI `0.7.41`、Respo `0.16.122`、
+JS-FFI `0.2.3`，传递 Router `0.8.36`。该版本为历史预发布工具链配对，
+不能作为正式 0.30.1 的验收声明；0.30.0 消费者原配对为 `0.0.36`。
 
 #### 0.30.0 历史迁移记录
 
@@ -92,7 +117,7 @@ caps verify --toolchain
 yarn install --immutable
 calcit calcit.cirru --check-only --all-defs
 calcit fix --workflow strict --verify
-calcit calcit.cirru --check-only --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
+calcit calcit.cirru --check-only --ns 'respo-message.$meta' --ns respo-message.action --ns respo-message.comp.container --ns respo-message.comp.message --ns respo-message.comp.messages --ns respo-message.config --ns respo-message.main --ns respo-message.schema --ns respo-message.updater --summary-only
 calcit calcit.cirru analyze weak-types --only coverage --summary-only
 calcit calcit.cirru js
 yarn check:unit
@@ -116,7 +141,7 @@ MIT
 
 本模块为 Calcit/Respo 应用提供消息组件及对应 updater。项目使用 canonical
 `calcit.cirru`，Calcit 与 `@calcit/procs` 按上文保持精确配对，并固定到已发布的
-Respo UI tag；CLI/runtime 当前是显式选用的 0.30.1-alpha.4，不称为稳定版。
+Respo UI tag；当前 0.0.38 候选使用正式 CLI/runtime 0.30.1，历史 alpha 配对见上文。
 
 Demo 前端资源使用正式 COS action v1.2.0，通过 `public-base-url` 启用内置逐文件
 校验，不另加上传验证脚本。PR CDN 路径按 PR/run/attempt 隔离，同一 PR 或生产
