@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { copyFile, mkdir, mkdtemp, rm, symlink } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const binary = process.env.CALCIT_BIN ?? 'calcit';
@@ -8,18 +8,8 @@ const run = (...args) => execFileSync(binary, args, { encoding: 'utf8', timeout:
 await mkdir('.calcit', { recursive: true });
 const scratch = await mkdtemp(resolve('.calcit/message-render-'));
 try {
-  const snapshot = join(scratch, 'calcit.cirru');
   const output = join(scratch, 'js-out');
-  await copyFile('calcit.cirru', snapshot);
-  await copyFile('deps.cirru', join(scratch, 'deps.cirru'));
-  await mkdir(join(scratch, '.calcit'));
-  await symlink(resolve('.calcit/modules'), join(scratch, '.calcit/modules'), 'dir');
-  run(snapshot, 'edit', 'add-import', 'respo-message.comp.message', '--code', 'quote (respo.render.html :refer (make-string))');
-  run(snapshot, 'edit', 'def', 'respo-message.comp.message/expose-render-check!', '--code',
-    'quote (defn expose-render-check! () (make-string (comp-message 0 ({} (:text |message)) ({}) (fn (info dispatch!) &unit))) &unit)');
-  run(snapshot, 'edit', 'schema', 'respo-message.comp.message/expose-render-check!', '--code',
-    "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)");
-  run(snapshot, '--reload-fn', 'respo-message.comp.message/expose-render-check!', '--emit-path', output, 'js');
+  run('calcit.cirru', '--emit-path', output, 'js');
   const load = name => import(pathToFileURL(join(output, `${name}.mjs`)).href);
   const c = await load('calcit.core');
   const { comp_message } = await load('respo-message.comp.message');

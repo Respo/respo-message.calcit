@@ -175,7 +175,7 @@
                 dy $ if (= true bottom?) 0 $ if (number? idx) (* idx 40) 0
               match action
                 :mount $ let
-                    element $ unsafe-coerce el 'js-ffi.browser/DomElementHost
+                    element $ browser/element-host el
                   browser/element-set-style! element |transform $ str "|translate(60px," dy "|px)"
                   browser/element-set-style! element |opacity |0
                   browser/set-timeout!
@@ -185,9 +185,9 @@
                       browser/element-set-style! element |zIndex |-1
                     , 10
                 :unmount $ let
-                    element $ unsafe-coerce el 'js-ffi.browser/DomElementHost
+                    element $ browser/element-host el
                     cloned $ element .clone-node true
-                    parent $ unsafe-coerce (element :parent-element) 'js-ffi.browser/DomElementHost
+                    parent $ browser/element-host $ element :parent-element
                   parent .append-child! cloned
                   browser/set-timeout!
                     fn ()
@@ -199,9 +199,10 @@
                     , 400
                 _ nil
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Dynamic)
-            :args $ [] 'Dynamic 'Dynamic 'Dynamic
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Effect)
+            :args $ [] 'MessageValue 'Number 'Bool
             :features $ #{} :js-ffi
+            :generics $ [] 'MessageValue
         'message-style-of $ %{} 'CodeEntry (:doc "|读取消息样式并校验为 map。")
           :code $ quote $ defn message-style-of (message)
             &let
