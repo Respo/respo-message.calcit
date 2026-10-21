@@ -56,6 +56,8 @@ Messages can be removed with `:id` or `:token`, where `:token` is what you can g
 依赖使用已发布 UI `0.8.0`、Respo `0.16.124`、JS-FFI `0.2.5`，传递 Router `0.8.37`。
 应用中的其他模块也必须请求一致的正式图；不要只改根版本、混用旧 alpha 图或放宽
 Caps strict。继续使用 Respo 0.16 兼容接口，不切换 0.17 的破坏性 dispatch API。
+UI 0.8 的基础样式更新会随依赖带入，Demo 按钮外观可能与 UI 0.7 不同；
+本模块没有额外改写消息 CSS。
 
 消息 Map、id/token 删除、缺失/非法时间回退与正常动画时序不变。淡入淡出效果将三处
 DOM 强转替换为 JS-FFI 已有的 `element-host` 运行时检查：非法宿主或缺失父元素会
@@ -67,8 +69,13 @@ DOM 强转替换为 JS-FFI 已有的 `element-host` 运行时检查：非法宿�
 Snapshot。完整 strict/preflight 和原 COS 内置校验保留，部署路径不变。
 局部不再直接使用 unsafe，不代表开放消息 Map、回调与框架 FFI 边界已全部类型化。
 
-本机原 alpha.4 匹配图的修改后回归已通过；正式配对仍以精确 HEAD Linux CI 和真实
-Demo 浏览器验收为准，完成前不合并、部署或发布本候选。
+正式配对已在 [Linux CI](https://github.com/Respo/respo-message.calcit/actions/runs/39575511496)
+通过自身 Caps strict 图、不可变 Yarn、完整 strict、全定义 181/181、公开定义 32/32、
+原 unit 4/4 及三类时间值 JS 渲染。该精确公开构建的真实 Demo 通过初始消息、Try、
+点击移除、Clear、多消息、自动消失和刷新回归，console warning/error 为空。
+长消息视觉截断在原 0.0.37 同环境中也复现，单独记录为
+[#53](https://github.com/Respo/respo-message.calcit/issues/53)，不是本次 DOM 类型改动的修复项。
+上述不替代真实下游项目的发布图集成；当前仍为未合并、未部署、未发布的候选。
 
 #### 0.30.1-alpha.4 历史记录
 
