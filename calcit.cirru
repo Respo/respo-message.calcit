@@ -6,7 +6,7 @@
     {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :js) (:reload-fn 'respo-message.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |js-ffi/
-      :type-slots $ {}
+      :type-slots $ {} $ :dispatch-op 'Dynamic
   :files $ {}
     'respo-message.action $ %{} 'FileEntry
       :defs $ {}
@@ -417,11 +417,13 @@
               :tags $ #{} :fast :unit
             %{} 'TestEntry (:name |create-with-payload)
               :code $ quote $ assert= |Hello
-                .unwrap $ get-in
-                  next-store-of
-                    :: action/create $ {} $ :text |Hello
-                    , |id-1 123
-                  [] :messages |id-1 :text
+                .unwrap-or
+                  get-in
+                    next-store-of
+                      :: action/create $ {} $ :text |Hello
+                      , |id-1 123
+                    [] :messages |id-1 :text
+                  , nil
               :tags $ #{} :fast :unit
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
