@@ -29,7 +29,7 @@
           :code $ quote $ def dict
             {} (:create create) (:remove-one remove-one) (:clear clear)
           :examples $ []
-            quote $ assert= true $ option:some? (get respo-message.action/dict :create)
+            quote $ assert= true $ .some? (get respo-message.action/dict :create)
             quote $ assert= 3 $ count respo-message.action/dict
           :schema $ :: 'Map 'Tag 'Tag
         'gen-tag $ %{} 'CodeEntry (:doc |)
@@ -77,7 +77,7 @@
                       :on-click $ fn (e d!)
                         let
                             new-token $ generate-id!
-                          d! $ :: action/create $ &merge schema/message
+                          d! $ :: action/create $ merge schema/message
                             {} (:token new-token)
                               :text $ lorem-ipsum/loremIpsum
                           browser/set-timeout!
@@ -135,7 +135,7 @@
               [] (effect-fade message idx bottom?)
                 div
                   {} (:class-name css-message)
-                    :style $ &merge message-style $ if bottom?
+                    :style $ merge message-style $ if bottom?
                       {} $ :bottom $ str
                         + 8 $ * idx 40
                         , |px
@@ -168,7 +168,7 @@
               :transition-duration |400ms
               :box-shadow $ str "|0px 0px 4px " $ hsl 0 0 10 0.1
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'String
         'effect-fade $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defeffect effect-fade (message idx bottom?) (action el *local)
             let
@@ -259,10 +259,10 @@
           :examples $ []
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? true
-              fn (info) nil
+              fn (info d!) &unit
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? false
-              fn (info) nil
+              fn (info d!) &unit
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] (:: 'Map 'String 'Dynamic) (:: 'Map 'Dynamic 'Dynamic) 'Fn
         'message-entries $ %{} 'CodeEntry (:doc "|去重并校验消息条目为 map。")
@@ -334,7 +334,7 @@
           :code $ quote $ def site
             {} (:dev-ui |http://localhost:8100/main-fonts.css) (:release-ui |http://cdn.tiye.me/favored-fonts/main-fonts.css) (:cdn-url |http://cdn.tiye.me/respo-message/) (:title |Message) (:icon |http://cdn.tiye.me/logo/respo.png) (:storage-key |respo-message)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Map 'Tag 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.config
     'respo-message.main $ %{} 'FileEntry
@@ -465,9 +465,9 @@
             {} (:id nil) (:token nil) (:text |) (:time 0)
               :style $ {}
           :examples $ []
-            quote $ &merge schema/message $ {} (:text |Hello) (:token |msg-1)
-            quote $ &merge schema/message $ {} (:text "|Error occurred")
-              :style $ {} $ :background-color (hsl 0 80 60)
+            quote $ merge respo-message.schema/message $ {} (:text |Hello) (:token |msg-1)
+            quote $ merge respo-message.schema/message $ {} (:text "|Error occurred")
+              :style $ {} $ :background-color (respo.util.format/hsl 0 80 60)
           :schema $ :: 'Dynamic
         'store $ %{} 'CodeEntry
           :doc "|Schema definition for the message store. Contains :messages (hashmap of messages by id) and :states (component states storage)."
@@ -475,9 +475,8 @@
             {}
               :messages $ {}
               :states $ {}
-          :examples $ []
-            quote $ schema/store
-            quote $ &merge schema/store $ {}
+          :examples $ [] (quote respo-message.schema/store)
+            quote $ merge respo-message.schema/store $ {}
               :messages $ {} $ |msg-1
                 {} $ :text |Hello
           :schema $ :: 'Map
@@ -492,8 +491,8 @@
                 &= op action/clear
                 {}
               (&= op action/create)
-                &map:assoc messages op-id $ &merge
-                  &merge schema/message $ decode-map-as op-data $ :: 'Map 'Tag 'Dynamic
+                &map:assoc messages op-id $ merge
+                  merge schema/message $ decode-map-as op-data $ :: 'Map 'Tag 'Dynamic
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
                 let

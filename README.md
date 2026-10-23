@@ -3,6 +3,17 @@
 
 > Message component for Respo apps.
 
+使用者影响：`0.0.39` 维护候选配对已发布 UI `0.8.1`、Respo `0.16.126`、
+JS-FFI `0.2.6` 及传递 Router `0.8.38`，CLI/runtime 保持正式 `0.30.1`。
+应用需协调直接/传递依赖，不能只提高根 pin 或放宽 Caps strict。消息 Map、id/token
+删除、时间回退、公开签名、动画与页面错误显示路径保持；仅修正附带示例的旧写法和
+明确的配置/CSS 类名类型，不将开放消息数据伪装成闭合 Struct。
+
+独立 `maintenance/0.30.1` 从正式 `0.0.38` 建立，不回退较新 main；维护线及其 PR
+只检查和构建，PR 保存相对路径 artifact，不上传 COS 或 rsync，不部署 Demo、不发布 npm。
+原 unit/真实 JS 渲染回归保留，示例通过现有 CLI 验收，不新增测试框架或验证脚本。
+候选未完成门禁与实际浏览器验收前不可当作已发布依赖。
+
 Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 渲染回归检查
