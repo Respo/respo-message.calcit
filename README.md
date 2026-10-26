@@ -5,6 +5,24 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
+### 当前 0.31 预发布维护线
+
+使用者影响：`0.1.0-alpha.2` 候选将 Calcit CLI 与 `@calcit/procs` 成对固定为
+已发布 `0.31.0-alpha.6`，UI 升为已发布 `0.9.0-alpha.2`；Respo 仍为
+`0.17.0-alpha.2`，JS-FFI 仍为 `0.2.5`，传递 Router 仍为 `0.9.0-alpha.1`。
+应用的其他模块也需选择一致的 UI/Respo 图，不只改根依赖或放宽 Caps strict。
+这是已有 0.31 预发布线的更新；0.30 稳定消费者继续使用原维护版本，不能混装。
+
+本轮 Snapshot 完全不变，不制造额外代码迁移：消息 API、Map/协议、id/token 删除、
+缺失/非法时间回退、动画及 Demo 事件不变。UI 条件渲染修复随依赖带入，
+不能把整个依赖图描述为源码/样式全部相同。消息值仍保持开放、动态的形状，并保留原宿主边界，
+不把版本升级宣称为类型债务归零。
+
+保留原完整 strict、全定义/公开 namespace、四项 unit、三类时间值 JS 渲染及构建；
+不新增测试、脚本、类型/安装策略例外或 COS 复验。继续使用 action 内置 verify，
+PR 隔离前缀、生产 COS/rsync 路径均不改。候选不代表已发布，发布状态以对应 Git tag 为准。
+下文 0.0.38 / 正式 0.30.1 及更早版本均为历史记录，不是当前主线的配对。
+
 ### 渲染回归检查
 
 `yarn check:render` 从当前 Snapshot 临时生成 JavaScript，实际渲染缺失时间、
@@ -50,7 +68,7 @@ dispatch! $ :: action/remove-one $ {} (:token |xxx)
 
 Messages can be removed with `:id` or `:token`, where `:token` is what you can generate.
 
-### 发布工具链
+### 0.0.38 / 0.30.1 历史发布工具链
 
 `0.0.38` 候选使用者注意：CLI / `@calcit/procs` 成对固定为正式 `0.30.1`，
 依赖使用已发布 UI `0.8.0`、Respo `0.16.124`、JS-FFI `0.2.5`，传递 Router `0.8.37`。
@@ -141,7 +159,7 @@ MIT
 
 本模块为 Calcit/Respo 应用提供消息组件及对应 updater。项目使用 canonical
 `calcit.cirru`，Calcit 与 `@calcit/procs` 按上文保持精确配对，并固定到已发布的
-Respo UI tag；当前 0.0.38 候选使用正式 CLI/runtime 0.30.1，历史 alpha 配对见上文。
+Respo UI tag；当前 0.31 候选的精确配对见开头，0.0.38 / 0.30.1 等历史说明不适用于当前主线。
 
 Demo 前端资源使用正式 COS action v1.2.0，通过 `public-base-url` 启用内置逐文件
 校验，不另加上传验证脚本。PR CDN 路径按 PR/run/attempt 隔离，同一 PR 或生产
