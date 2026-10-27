@@ -5,27 +5,23 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### 当前正式 0.31 工具链维护线
+### 使用者需要注意
 
-本仓库提交仍为模块候选，未发布新 tag；消费者需同步 CLI/runtime 并重新生成 JS，不用候选、main 或 commit 替代已发布依赖。
+候选 `0.1.0-alpha.3` 配对正式 Calcit CLI / `@calcit/procs` `0.31.0`，
+依赖已发布 UI `0.9.0-alpha.4`、Respo `0.17.0-alpha.4`、JS FFI `0.2.7`，
+间接 Router 为 `0.9.0-alpha.3`。消费者需协调完整版本图并重新生成 JS；
+不以 main、候选分支或 commit 替代发布 tag，不修改缓存或放宽 Caps strict。
+0.30.1 使用者继续使用 0.0.x 维护线，本提交不等于新 tag 已发布。
 
-使用者影响：Calcit CLI 与 `@calcit/procs` 从 alpha.7 成对升级为
-已发布 `0.31.0`，UI 保持已发布 `0.9.0-alpha.2`；Respo 仍为
-`0.17.0-alpha.2`，JS-FFI 仍为 `0.2.5`，传递 Router 仍为 `0.9.0-alpha.1`。
-应用的其他模块也需选择一致的 UI/Respo 图，不只改根依赖或放宽 Caps strict。
-这是已有 0.31 维护线的正式工具链配对更新；0.30 稳定消费者继续使用原维护版本，不能混装。
-默认预检查会拒绝未证明的 Dynamic 流向；原完整 strict 和测试保留，
-不添加兼容开关、关闭 proof audit 或放宽类型基线。
+三个定义的八处集合操作改用现有 Map/Set/List 接收者方法，保留消息 API、
+id/token 删除、过滤与去重顺序、缺失/非法时间回退、动画和 Demo 事件。
+`css-message` 按 `defstyle` 已声明的展开合同补齐 String 类型；CSS 规则不改。
+原始 Enum 操作与真实开放消息字段保持兼容；不宣称 payload 已全部强类型化，
+也不通过强转、关闭 proof audit 或预算例外绕过原门禁。
 
-本轮 Snapshot 完全不变，不制造额外代码迁移：消息 API、Map/协议、id/token 删除、
-缺失/非法时间回退、动画及 Demo 事件不变。UI 条件渲染修复随依赖带入，
-不能把整个依赖图描述为源码/样式全部相同。消息值仍保持开放、动态的形状，并保留原宿主边界，
-不把版本升级宣称为类型债务归零。
-
-保留原完整 strict、全定义/公开 namespace、四项 unit、三类时间值 JS 渲染及构建；
-不新增测试、脚本、类型/安装策略例外或 COS 复验。继续使用 action 内置 verify，
-PR 隔离前缀、生产 COS/rsync 路径均不改。候选不代表已发布，发布状态以对应 Git tag 为准。
-下文 0.0.38 / 正式 0.30.1 及更早版本均为历史记录，不是当前主线的配对。
+原完整 strict、全定义/公开 namespace、四项 unit、三类时间值 JS 渲染及构建保留。
+COS 仅使用 action 内置 verify，PR 隔离前缀、生产 COS/rsync 路径不变。
+历史迁移记录见 Git 历史与文末链接，不把旧版本验收数字当作本提交证据。
 
 ### 渲染回归检查
 
@@ -72,64 +68,11 @@ dispatch! $ :: action/remove-one $ {} (:token |xxx)
 
 Messages can be removed with `:id` or `:token`, where `:token` is what you can generate.
 
-### 0.0.38 / 0.30.1 历史发布工具链
+### 开发与验证
 
-`0.0.38` 候选使用者注意：CLI / `@calcit/procs` 成对固定为正式 `0.30.1`，
-依赖使用已发布 UI `0.8.0`、Respo `0.16.124`、JS-FFI `0.2.5`，传递 Router `0.8.37`。
-应用中的其他模块也必须请求一致的正式图；不要只改根版本、混用旧 alpha 图或放宽
-Caps strict。继续使用 Respo 0.16 兼容接口，不切换 0.17 的破坏性 dispatch API。
-UI 0.8 的基础样式更新会随依赖带入，Demo 按钮外观可能与 UI 0.7 不同；
-本模块没有额外改写消息 CSS。
-
-消息 Map、id/token 删除、缺失/非法时间回退与正常动画时序不变。淡入淡出效果将三处
-DOM 强转替换为 JS-FFI 已有的 `element-host` 运行时检查：非法宿主或缺失父元素会
-明确抛错，不静默跳过。效果工厂的返回值明确为 `respo.schema/Effect`，参数是泛型
-消息身份值、Number 索引与 Bool 方向；公共组件已有的索引/方向行为不改。
-
-原 4 项 unit 和 3 类时间值 JS 渲染断言保留，不新增防御性测试表、迁移适配层、
-验证脚本或预算。JS 回归只编译 canonical Snapshot，不再为暴露 renderer 临时改写
-Snapshot。完整 strict/preflight 和原 COS 内置校验保留，部署路径不变。
-局部不再直接使用 unsafe，不代表开放消息 Map、回调与框架 FFI 边界已全部类型化。
-
-正式配对已在 [Linux CI](https://github.com/Respo/respo-message.calcit/actions/runs/39575511496)
-通过自身 Caps strict 图、不可变 Yarn、完整 strict、全定义 181/181、公开定义 32/32、
-原 unit 4/4 及三类时间值 JS 渲染。该精确公开构建的真实 Demo 通过初始消息、Try、
-点击移除、Clear、多消息、自动消失和刷新回归，console warning/error 为空。
-长消息视觉截断在原 0.0.37 同环境中也复现，单独记录为
-[#53](https://github.com/Respo/respo-message.calcit/issues/53)，不是本次 DOM 类型改动的修复项。
-上述不替代真实下游项目的发布图集成；当前仍为未合并、未部署、未发布的候选。
-
-#### 0.30.1-alpha.4 历史记录
-
-`0.0.37` 使用 CLI/runtime `0.30.1-alpha.4`、UI `0.7.41`、Respo `0.16.122`、
-JS-FFI `0.2.3`，传递 Router `0.8.36`。该版本为历史预发布工具链配对，
-不能作为正式 0.30.1 的验收声明；0.30.0 消费者原配对为 `0.0.36`。
-
-#### 0.30.0 历史迁移记录
-
-`0.0.36` 使用者影响：UI 升级为正式 `0.7.40`，与 Reel `0.6.38` 对齐，
-避免 Caps strict 拒绝混用旧 UI `0.7.39`；传递依赖 Router 为 `0.8.35`。
-Calcit/procs 仍为正式 `0.30.0`，模块 Snapshot、消息 API、数据格式与部署路径
-均不修改。以下 `0.0.35` 段落保留上次迁移的历史验证范围。
-
-使用者影响：候选 `0.0.35` 配对正式 Calcit / `@calcit/procs` `0.30.0`，消费者需同步应用工具链。继续使用已发布的正式 UI 依赖图。创建消息的 payload 明确检查为 Tag key 的 Map；`:text`、`:token`、`:style` 等既有字段和任意附加 Tag 字段保留，非法 payload 提前报错，不依靠合并原语间接失败。旧消息缺失/非法时间回退为 `0`、按 token/id 删除及清空行为不变。消息值仍允许异构数据，不宣称整个模型已完全类型化。
-
-demo 的挂载点改用 Respo 自带的 `query-selector`，保留缺失节点时 unwrap 抛错的行为及宿主元素身份，不在应用中强转两个库的 DOM trait。renderer 使用准确回调契约，开放 dispatch 边界只接受实际 Enum；`:states` 的 cursor 和返回 store 使用实际 Map/List 检查而非类型断言。
-
-项目使用 `calcit.cirru` / `deps.cirru`，CLI 与 `@calcit/procs` 固定为
-已发布的 `0.30.0`，Node 24、Yarn 4.18.0 和 Vite 8.3.1。
-`0.0.35` 使用正式 UI `0.7.39`、Respo `0.16.120`、JS-FFI `0.2.3`，
-传递依赖 Router `0.8.34`；当前 `0.0.36` 的依赖升级见上文。
-`lilac`/`memof` 已移除，消息 Map 的可选字段仍由显式 Option 处理。
-既有单元测试使用内置 `calcit.test`。重复的类型预算脚本和配置已移除，
-以严格检查作为正确性门禁；`weak-types` 仅提供覆盖率与旧 API 诊断，不冒充强制预算。
-
-本轮将业务代码 13 处旧 Map 读取改为公开 `get` / Option，再还原原有 nil 语义，
-不改写原字段默认值或真值判断。原测试中 4 处读取改为 `get` / `get-in` 解包，
-保留原 4 项测试的标识、标签与断言；`gen-tag` 对已确认的 String 改用公开 `to-tag`。
-原单元测试、JS 渲染检查、20 类消息值/错误对比、完整 strict 及构建均通过。
-仍有 35 处 unresolved slot、14 个不完整定义，类型覆盖与原版相同，不声称零债务。
-本轮没有新增测试、验证脚本、预算、编译器规则或 COS 配置。
+消息 Map 仍允许异构数据；创建 payload 经原有 Tag-key Map 解码，DOM 动画沿用
+JS FFI 的运行时宿主检查，不添加类型断言或默认值。长消息截断是既有
+[#53](https://github.com/Respo/respo-message.calcit/issues/53)，本迁移不宣称修复。
 
 提交前运行：
 
@@ -163,7 +106,7 @@ MIT
 
 本模块为 Calcit/Respo 应用提供消息组件及对应 updater。项目使用 canonical
 `calcit.cirru`，Calcit 与 `@calcit/procs` 按上文保持精确配对，并固定到已发布的
-Respo UI tag；当前 0.31 候选的精确配对见开头，0.0.38 / 0.30.1 等历史说明不适用于当前主线。
+Respo UI tag；当前候选的精确配对见开头。
 
 Demo 前端资源使用正式 COS action v1.2.0，通过 `public-base-url` 启用内置逐文件
 校验，不另加上传验证脚本。PR CDN 路径按 PR/run/attempt 隔离，同一 PR 或生产

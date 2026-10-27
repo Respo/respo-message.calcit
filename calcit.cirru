@@ -168,7 +168,7 @@
               :transition-duration |400ms
               :box-shadow $ str "|0px 0px 4px " $ hsl 0 0 10 0.1
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'String
         'effect-fade $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defeffect effect-fade (message idx bottom?) (action el *local)
             let
@@ -268,7 +268,7 @@
         'message-entries $ %{} 'CodeEntry (:doc "|去重并校验消息条目为 map。")
           :code $ quote $ defn message-entries (messages)
             foldl
-              &set:to-list $ distinct-values messages
+              .to-list $ .distinct-values messages
               []
               defn %message-entry (acc message)
                 hint-fn $ {}
@@ -276,7 +276,7 @@
                     :: 'List $ :: 'Map 'Dynamic 'Dynamic
                     , 'Dynamic
                   :return $ :: 'List $ :: 'Map 'Dynamic 'Dynamic
-                if (map? message) (append acc message)
+                if (map? message) (.append acc message)
                   raise $ str "|respo-message expected each message as a map, got: " $ type-of message
           :examples $ []
           :schema $ :: 'Fn $ {}
@@ -394,7 +394,7 @@
                         &enum:nth op 1
                         {}
                       , op-id op-time
-                  &map:assoc store :messages next-messages
+                  .assoc store :messages next-messages
                 match op
                   (:states cursor s)
                     decode-map-as
@@ -494,7 +494,7 @@
                 &= op action/clear
                 {}
               (&= op action/create)
-                &map:assoc messages op-id $ &merge
+                .assoc messages op-id $ &merge
                   &merge schema/message $ decode-map-as op-data $ :: 'Map 'Tag 'Dynamic
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
@@ -507,7 +507,7 @@
                       .unwrap-or (get data :id) nil
                       , nil
                   if (non-nil? token)
-                    -> messages (to-pairs)
+                    -> messages (.to-pairs)
                       filter $ fn (pair)
                         let[] (k message) pair $ not $ &= token
                           or
@@ -517,9 +517,9 @@
                                 , :token
                               , nil
                             , nil
-                      &set:to-list
+                      .to-list
                       pairs-map
-                    &map:dissoc messages message-id
+                    .dissoc messages message-id
               true messages
           :examples $ []
             quote $ assert= 1 $ count
