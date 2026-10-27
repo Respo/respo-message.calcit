@@ -5,14 +5,16 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### 当前 0.31 预发布维护线
+### 当前正式 0.31 工具链维护线
 
-使用者影响：Calcit CLI 与 `@calcit/procs` 从 alpha.6 成对升级为
-已发布 `0.31.0-alpha.7`，UI 保持已发布 `0.9.0-alpha.2`；Respo 仍为
+本仓库提交仍为模块候选，未发布新 tag；消费者需同步 CLI/runtime 并重新生成 JS，不用候选、main 或 commit 替代已发布依赖。
+
+使用者影响：Calcit CLI 与 `@calcit/procs` 从 alpha.7 成对升级为
+已发布 `0.31.0`，UI 保持已发布 `0.9.0-alpha.2`；Respo 仍为
 `0.17.0-alpha.2`，JS-FFI 仍为 `0.2.5`，传递 Router 仍为 `0.9.0-alpha.1`。
 应用的其他模块也需选择一致的 UI/Respo 图，不只改根依赖或放宽 Caps strict。
-这是已有 0.31 预发布线的更新；0.30 稳定消费者继续使用原维护版本，不能混装。
-alpha.7 默认预检查会拒绝未证明的 Dynamic 流向；原完整 strict 和测试保留，
+这是已有 0.31 维护线的正式工具链配对更新；0.30 稳定消费者继续使用原维护版本，不能混装。
+默认预检查会拒绝未证明的 Dynamic 流向；原完整 strict 和测试保留，
 不添加兼容开关、关闭 proof audit 或放宽类型基线。
 
 本轮 Snapshot 完全不变，不制造额外代码迁移：消息 API、Map/协议、id/token 删除、
