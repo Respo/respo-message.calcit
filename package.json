@@ -10,7 +10,7 @@
     "check:render": "node check-message-render.mjs"
   },
   "dependencies": {
-    "@calcit/procs": "0.31.0-alpha.7"
+    "@calcit/procs": "0.31.0"
   },
   "devDependencies": {
     "lorem-ipsum": "^2.0.8",
