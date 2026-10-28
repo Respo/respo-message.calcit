@@ -5,7 +5,21 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### 使用者需要注意
+### Calcit 0.32.0 候选：使用者需要注意
+
+Message **0.1.0** 候选配对正式 CLI / `@calcit/procs` **0.32.0**、UI **0.9.0**、
+Respo **0.17.0**、JS FFI **0.2.8**，传递 Router **0.9.0**。Respo/UI/Router 的正式 tag
+尚未齐备，当前仅用独立本地候选图验收；不是 Caps 正式安装或可发布证明。
+待整图发布后重新安装、生成 JS 并刷新，不用分支/hash 替代发布依赖。
+
+本次通过官方 formatter 迁移两个定义中的 Fn 标注；30 个定义的 schema 保持不变。
+消息 API、id/token 移除、时间回退、动画及原 COS/rsync 配置保持，原门禁未放宽。
+本轮 181 个全定义、32 个公开定义、完整 strict（diagnostics 为空）、原四项 unit、
+缺失/数字/旧非法时间三类 JS 渲染、immutable 安装和 Vite 构建通过。
+实际页面验证 Try 消息出现及自动消失、Clear 动画结束后清空、刷新初始化，控制台无 warning/error。
+长消息截断仍是既有 #53，不宣称本次修复；不新增验证脚本或类型例外。
+
+### 历史：0.31 使用者需要注意
 
 候选 `0.1.0-alpha.3` 配对正式 Calcit CLI / `@calcit/procs` `0.31.0`，
 依赖已发布 UI `0.9.0-alpha.4`、Respo `0.17.0-alpha.4`、JS FFI `0.2.7`，
