@@ -441,7 +441,7 @@
             quote $ &merge schema/message $ {} (:text |Hello) (:token |msg-1)
             quote $ &merge schema/message $ {} (:text "|Error occurred")
               :style $ {} $ :background-color (hsl 0 80 60)
-          :schema $ quote Dynamic
+          :schema $ quote $ Map Tag Dynamic
         'store $ %{} 'CodeEntry
           :doc "|Schema definition for the message store. Contains :messages (hashmap of messages by id) and :states (component states storage)."
           :code $ quote $ def store
