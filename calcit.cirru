@@ -314,7 +314,7 @@
           :code $ quote $ def site
             {} (:dev-ui |http://localhost:8100/main-fonts.css) (:release-ui |http://cdn.tiye.me/favored-fonts/main-fonts.css) (:cdn-url |http://cdn.tiye.me/respo-message/) (:title |Message) (:icon |http://cdn.tiye.me/logo/respo.png) (:storage-key |respo-message)
           :examples $ []
-          :schema $ quote Dynamic
+          :schema $ quote $ Map Tag String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.config
     'respo-message.main $ %{} 'FileEntry
