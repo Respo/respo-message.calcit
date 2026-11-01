@@ -7,29 +7,20 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 使用者需要注意
 
-版本 `0.1.0` 配对 Calcit CLI / `@calcit/procs` `0.32.1`，
-依赖 UI `0.9.0`、Respo `0.17.1`、JS FFI `0.2.9`，间接 Router 为 `0.9.0-alpha.4`。
-Snapshot 已迁移为 0.32 类型写法，`schema/message` 与 `schema/store` 补充 `Map Tag Dynamic` 标注。
-消费者需协调完整版本图并重新生成 JS；不以 main、候选分支或 commit 替代发布 tag，不放宽 Caps strict。
-0.30.1 使用者继续使用 0.0.x 维护线。只有正式 Git tag 创建后，消费者才使用 `0.1.0`；本版本的库源码与 main 5112f4b 相同，不新增 API 或运行语义。
-本次 Git 发版不包含 npm 发布或生产 Demo 部署。
+候选 `0.1.1` 配对正式 Calcit CLI / `@calcit/procs` `0.32.1`，依赖正式 UI `0.10.0`、Respo `0.18.0`、JS-FFI `0.2.9`（传递 Router `0.9.0`）。消费者须协调完整精确图并重新生成 JS；直接构造上游 DomProps 的代码采用 Option 字段。旧 tag 不移动，0.1.1 发布前不引用 main/hash；0.30.1 使用者继续使用 0.0.x 维护线。
 
-三个定义的八处集合操作改用现有 Map/Set/List 接收者方法，保留消息 API、
-id/token 删除、过滤与去重顺序、缺失/非法时间回退、动画和 Demo 事件。
-`css-message` 按 `defstyle` 已声明的展开合同补齐 String 类型；CSS 规则不改。
-原始 Enum 操作与真实开放消息字段保持兼容；不宣称 payload 已全部强类型化，
-也不通过强转、关闭 proof audit 或预算例外绕过原门禁。
+消息读取改为显式 Option 处理，保留原公开 updater 的 token/ID 优先级：有效 token 优先按组删除；nil/false token 仍走 ID 删除，0/空字符串不被当成缺失。ID 缺失/nil/false 继续按原 Map 的 nil key 处理，渲染 key 仍回退为空字符串，避免默认 nil token 误删整组或显式 nil ID 不能渲染。原本有这些特殊 Map key 的调用方不被静默改合同。
 
-原完整 strict、全定义/公开 namespace、四项 unit、三类时间值 JS 渲染及构建保留。
-COS 仅使用 action 内置 verify，PR 隔离前缀、生产 COS/rsync 路径不变。
-历史迁移记录见 Git 历史与文末链接，不把旧版本验收数字当作本提交证据。
+点击回调的 payload 会省略值为 nil 的 `:id` / `:token`，不再填入 nil；依赖 `.contains-key?` 区分“缺键”和“值为 nil”的集成需注意这一可见变化。`update-messages` 仍兼容旧回调携带的显式 nil/false。原 Enum 操作、消息过滤顺序、缺失/非法时间回退、动画、实际 JS HUD、存档与部署路径保持。
+
+修复复用原附带 unit 和原 JS runner，只补真实回归，不增加 checker、强转、类型预算或兼容开关。完整 strict、全定义/公开 namespace、原 unit、时间回退渲染及构建门禁保留；COS 只用 action 内置 verify。原一小时 npm 新候选包龄不加豁免。历史验收不自动作为当前候选通过依据。
 
 ### 渲染回归检查
 
 `yarn check:render` 从当前 Snapshot 临时生成 JavaScript，实际渲染缺失时间、
 数字时间和旧格式非法时间的消息。检查保留原有时间回退为 `0` 的行为，
 防止时间读取函数与局部变量同名时产生 JavaScript 初始化顺序异常。
-仅生成代码位于 `.calcit/`，执行后自动清理。直接使用编译器已生成的真实 renderer，
+同一 runner 另检查 nil/false token 只删除指定 ID，以及 nil/false ID 的实际列表渲染；附带 unit 保留同一误删回归。仅生成代码位于 `.calcit/`，执行后自动清理。直接使用编译器已生成的真实 renderer，
 不再复制或改写 Snapshot、注入测试 helper，也不修改 reload 入口。
 
 ### Usages
