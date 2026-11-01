@@ -7,7 +7,9 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 使用者需要注意
 
-候选 `0.1.1` 配对正式 Calcit CLI / `@calcit/procs` `0.32.1`，依赖正式 UI `0.10.0`、Respo `0.18.0`、JS-FFI `0.2.9`（传递 Router `0.9.0`）。消费者须协调完整精确图并重新生成 JS；直接构造上游 DomProps 的代码采用 Option 字段。旧 tag 不移动，0.1.1 发布前不引用 main/hash；0.30.1 使用者继续使用 0.0.x 维护线。
+候选 `0.1.2` 配对正式 Calcit CLI / `@calcit/procs` `0.34.0`，依赖正式 UI `0.10.0`、Respo `0.18.0`、JS-FFI `0.2.9`（传递 Router `0.9.0`）。消费者须协调完整精确图并重新生成 JS；直接构造上游 DomProps 的代码采用 Option 字段。旧 tag 不移动，0.1.2 发布前不引用 main/hash；0.30.1 使用者继续使用 0.0.x 维护线。
+
+本次保留公开消息 Map 合同。Demo 的开发检查节点显式转换为 Option，关闭开发模式时仍不显示；检查样式使用空 Map，以适配当前及后续 Respo 的受检样式合同。
 
 消息读取改为显式 Option 处理，保留原公开 updater 的 token/ID 优先级：有效 token 优先按组删除；nil/false token 仍走 ID 删除，0/空字符串不被当成缺失。ID 缺失/nil/false 继续按原 Map 的 nil key 处理，渲染 key 仍回退为空字符串，避免默认 nil token 误删整组或显式 nil ID 不能渲染。原本有这些特殊 Map key 的调用方不被静默改合同。
 
