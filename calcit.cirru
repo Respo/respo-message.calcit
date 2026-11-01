@@ -60,10 +60,11 @@
           :code $ quote $ defcomp comp-container (store)
             let
                 messages $ decode-map-as
-                  or
-                    .unwrap-or (get store :messages) nil
-                    {}
-                  :: 'Map 'String 'Dynamic
+                  match (get store :messages)
+                    (:some value)
+                      either value $ {}
+                    (:none) ({})
+                  quote $ Map String Dynamic
               div
                 {}
                   :class-name $ str-spaced css/global css/fullscreen
@@ -118,14 +119,8 @@
         'comp-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-message (idx message options on-remove!)
             let
-                bottom? $ = true $ .unwrap-or (get options :bottom?) nil
+                bottom? $ = true $ .unwrap-or (get options :bottom?) false
                 message-style $ message-style-of message
-                message-id $ or
-                  .unwrap-or (get message :id) nil
-                  , nil
-                message-token $ or
-                  .unwrap-or (get message :token) nil
-                  , nil
                 message-timestamp $ message-time message
                 message-text $ message-text-of message
               [] (effect-fade message idx bottom?)
@@ -139,7 +134,10 @@
                         :transform $ str "|translate(0," (* idx 40) "|px)"
                     :on-click $ fn (e d!)
                       on-remove!
-                        {} (:id message-id) (:token message-token) (:index idx) (:time message-timestamp)
+                        ->
+                          {} (:index idx) (:time message-timestamp)
+                          with-present :id $ get message :id
+                          with-present :token $ get message :token
                         , d!
                   <> message-text nil
           :examples $ []
@@ -198,7 +196,7 @@
         'message-style-of $ %{} 'CodeEntry (:doc "|读取消息样式并校验为 map。")
           :code $ quote $ defn message-style-of (message)
             &let
-              style $ .unwrap-or (get message :style) nil
+              style $ .unwrap-or (get message :style) ({})
               if (nil? style) ({})
                 if (map? style) style $ raise "|respo-message expected :style as a map"
           :examples $ []
@@ -207,10 +205,20 @@
         'message-text-of $ %{} 'CodeEntry (:doc "|读取消息文本，非字符串值按显示文本转换。")
           :code $ quote $ defn message-text-of (message)
             &let
-              text $ .unwrap-or (get message :text) nil
+              text $ .unwrap-or (get message :text) |
               if (string? text) text $ if (nil? text) | $ str text
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic Dynamic) (-> String)
+        'with-present $ %{} 'CodeEntry
+          :doc "|Add k when the value is present and not nil; otherwise keep the map, so a removal payload only carries the fields the message has."
+          :code $ quote $ defn with-present (m k value-option)
+            match value-option
+              (:some value)
+                if (nil? value) m $ assoc m k value
+              (:none) m
+          :examples $ []
+          :schema $ quote $ Fn (Map Tag Dynamic) Tag (Option Dynamic)
+            -> $ Map Tag Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.message
           :require
@@ -227,7 +235,7 @@
           :doc "|Respo component that renders a list of toast messages. Pass messages map, options (with :bottom? flag for positioning), and on-remove! callback. Messages are auto-sorted by time (newest first) and rendered at fixed position (top-right or bottom-right)."
           :code $ quote $ defcomp comp-messages (messages options on-remove!)
             let
-                bottom? $ = true $ .unwrap-or (get options :bottom?) nil
+                bottom? $ = true $ .unwrap-or (get options :bottom?) false
               list->
                 {} $ :style $ if bottom?
                   {} (:position :fixed) (:bottom 0) (:right 0)
@@ -240,9 +248,7 @@
                     hint-fn $ Fn Number (Map Dynamic Dynamic)
                       -> $ List Dynamic
                     []
-                      or
-                        .unwrap-or (get message :id) nil
-                        , |
+                      .unwrap-or (get message :id) |
                       comp-message idx message options on-remove!
           :examples $ []
             quote $ respo-message.comp.messages/comp-messages ({})
@@ -270,7 +276,7 @@
         'message-time $ %{} 'CodeEntry (:doc "|读取消息时间用于排序，缺失或非数字时为 0。")
           :code $ quote $ defn message-time (message)
             &let
-              t $ .unwrap-or (get message :time) nil
+              t $ .unwrap-or (get message :time) 0
               if (number? t) t 0
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic Dynamic) (-> Number)
@@ -360,8 +366,11 @@
                 let
                     next-messages $ update-messages
                       decode-map-as
-                        .unwrap-or (get store :messages) nil
-                        :: 'Map 'Dynamic 'Dynamic
+                        match (get store :messages)
+                          (:some value)
+                            either value $ {}
+                          (:none) ({})
+                        quote $ Map Dynamic Dynamic
                       &enum:nth op 0
                       if
                         > (&enum:count op) 1
@@ -373,9 +382,9 @@
                   (:states cursor s)
                     decode-map-as
                       update-states store
-                        decode-map-as cursor $ :: 'List 'Dynamic
+                        decode-map-as cursor $ quote $ List Dynamic
                         , s
-                      :: 'Map 'Dynamic 'Dynamic
+                      quote $ Map Dynamic Dynamic
                   _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
           :schema $ quote $ Fn Enum String Number
@@ -466,31 +475,27 @@
                 {}
               (&= op action/create)
                 .assoc messages op-id $ &merge
-                  &merge schema/message $ decode-map-as op-data $ :: 'Map 'Tag 'Dynamic
+                  &merge schema/message $ decode-map-as op-data $ quote (Map Tag Dynamic)
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
                 let
-                    data $ decode-map-as op-data $ :: 'Map 'Dynamic 'Dynamic
-                    token $ or
-                      .unwrap-or (get data :token) nil
-                      , nil
-                    message-id $ or
-                      .unwrap-or (get data :id) nil
-                      , nil
-                  if (non-nil? token)
-                    -> messages (.to-pairs)
-                      filter $ fn (pair)
-                        let[] (k message) pair $ not $ &= token
-                          or
-                            .unwrap-or
-                              get
-                                decode-map-as message $ :: 'Map 'Dynamic 'Dynamic
-                                , :token
-                              , nil
-                            , nil
-                      .to-list
-                      pairs-map
-                    .dissoc messages message-id
+                    data $ decode-map-as op-data $ quote (Map Dynamic Dynamic)
+                    token $ get data :token
+                    message-id $ get data :id
+                  match token
+                    (:some token-value)
+                      -> messages (.to-pairs)
+                        filter $ fn (pair)
+                          let[] (k message) pair $ not= (Option :some token-value)
+                            get
+                              decode-map-as message $ quote $ Map Dynamic Dynamic
+                              , :token
+                        .to-list
+                        pairs-map
+                    (:none)
+                      match message-id
+                        (:some id) (.dissoc messages id)
+                        (:none) messages
               true messages
           :examples $ []
             quote $ assert= 1 $ count
