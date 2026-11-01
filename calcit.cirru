@@ -248,7 +248,9 @@
                     hint-fn $ Fn Number (Map Dynamic Dynamic)
                       -> $ List Dynamic
                     []
-                      .unwrap-or (get message :id) |
+                      match (get message :id)
+                        (:some id) (if id id |)
+                        (:none) |
                       comp-message idx message options on-remove!
           :examples $ []
             quote $ respo-message.comp.messages/comp-messages ({})
@@ -480,7 +482,10 @@
               (&= op action/remove-one)
                 let
                     data $ decode-map-as op-data $ quote (Map Dynamic Dynamic)
-                    token $ get data :token
+                    token $ match (get data :token)
+                      (:some value)
+                        if value (Option :some value) (Option :none)
+                      (:none) (Option :none)
                     message-id $ get data :id
                   match token
                     (:some token-value)
@@ -494,8 +499,9 @@
                         pairs-map
                     (:none)
                       match message-id
-                        (:some id) (.dissoc messages id)
-                        (:none) messages
+                        (:some id)
+                          if id (.dissoc messages id) (.dissoc messages nil)
+                        (:none) (.dissoc messages nil)
               true messages
           :examples $ []
             quote $ assert= 1 $ count
@@ -522,6 +528,23 @@
                   , action/remove-one
                     {} $ :token |gone
                     , |id-2 1234567891
+              :tags $ #{} :fast :unit
+            %{} 'TestEntry (:name |falsey-token-removes-only-requested-id)
+              :code $ quote $ let
+                  check $ fn (token)
+                    hint-fn $ Fn Dynamic $ -> Unit
+                    let
+                        messages $ {}
+                          :a $ {} (:id :a) (:token token)
+                          :b $ {} (:id :b) (:token token)
+                        expected $ {} $ :b
+                          {} (:id :b) (:token token)
+                      assert= expected $ update-messages messages action/remove-one
+                        {} (:id :a) (:token token)
+                        , |op 0
+                      , &unit
+                check nil
+                check false
               :tags $ #{} :fast :unit
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.updater
