@@ -7,11 +7,12 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 使用者需要注意
 
-候选 `0.1.0-alpha.4` 配对正式 Calcit CLI / `@calcit/procs` `0.32.1`，
+版本 `0.1.0` 配对 Calcit CLI / `@calcit/procs` `0.32.1`，
 依赖 UI `0.9.0`、Respo `0.17.1`、JS FFI `0.2.9`，间接 Router 为 `0.9.0-alpha.4`。
 Snapshot 已迁移为 0.32 类型写法，`schema/message` 与 `schema/store` 补充 `Map Tag Dynamic` 标注。
 消费者需协调完整版本图并重新生成 JS；不以 main、候选分支或 commit 替代发布 tag，不放宽 Caps strict。
-0.30.1 使用者继续使用 0.0.x 维护线，本提交不等于新 tag 已发布。
+0.30.1 使用者继续使用 0.0.x 维护线。只有正式 Git tag 创建后，消费者才使用 `0.1.0`；本版本的库源码与 main 5112f4b 相同，不新增 API 或运行语义。
+本次 Git 发版不包含 npm 发布或生产 Demo 部署。
 
 三个定义的八处集合操作改用现有 Map/Set/List 接收者方法，保留消息 API、
 id/token 删除、过滤与去重顺序、缺失/非法时间回退、动画和 Demo 事件。
