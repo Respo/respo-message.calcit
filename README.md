@@ -7,17 +7,13 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 使用者需要注意
 
-0.1.3 候选配对 Calcit CLI / JS 运行时 0.34.1，使用已发布 UI 0.12.0、Respo 0.18.0 和 JS-FFI 0.2.9。升级后重新严格安装依赖并生成 JS。
+0.2.0 配对正式 Calcit CLI / JS 运行时 **0.34.2**，使用已发布 UI **0.14.0**、Respo **0.19.1** 和 JS-FFI **0.2.10**。升级后严格安装完整依赖图并重新生成 JS；发行状态以正式 Git tag 为准。这里验证的是 Message 自身的完整依赖图，不能仅用 UI 的源码兼容夹具代替。
 
-消息文本改为省略可选样式参数，避免将 nil 传给后续 Respo 的 TextStyle union。此调用也兼容当前正式依赖，消息内容和布局沿用原逻辑。
+消息 `:style` 入口改为校验 `Map Tag respo-ui.schema/InlineStyleValue`：键为 Tag，值为 String、Number、Tag 或 `Option StyleValue`。整个 `:style` 缺省或 nil 仍为空 Map；单个属性的 some 会解包、none 不渲染。原来开放 Map 中的 Bool、集合、函数及单属性 nil 不符合这个合同，会在读取样式时更早拒绝；旧 nil 属性请改为 `Option :none`。因为这是公开输入的收紧，本次升 minor，不扩大 union 容纳无效 CSS 值。
 
-本次保留公开消息 Map 合同。Demo 的开发检查节点显式转换为 Option，关闭开发模式时仍不显示；检查样式使用空 Map，以适配当前及后续 Respo 的受检样式合同。
+公开消息 Map 与 token/ID 优先级、nil/false token 按 ID 删除、缺失或非法时间回退、消息排序、动画、派发及页面 `hud!` 保持。真实异构消息及状态边界继续检查，不把整条消息伪装为有限 union。名义消息模型与回调全面改造不属于本次变更。
 
-消息读取改为显式 Option 处理，保留原公开 updater 的 token/ID 优先级：有效 token 优先按组删除；nil/false token 仍走 ID 删除，0/空字符串不被当成缺失。ID 缺失/nil/false 继续按原 Map 的 nil key 处理，渲染 key 仍回退为空字符串，避免默认 nil token 误删整组或显式 nil ID 不能渲染。原本有这些特殊 Map key 的调用方不被静默改合同。
-
-点击回调的 payload 会省略值为 nil 的 `:id` / `:token`，不再填入 nil；依赖 `.contains-key?` 区分“缺键”和“值为 nil”的集成需注意这一可见变化。`update-messages` 仍兼容旧回调携带的显式 nil/false。原 Enum 操作、消息过滤顺序、缺失/非法时间回退、动画、实际 JS HUD、存档与部署路径保持。
-
-修复复用原附带 unit 和原 JS runner，只补真实回归，不增加 checker、强转、类型预算或兼容开关。完整 strict、全定义/公开 namespace、原 unit、时间回退渲染及构建门禁保留；COS 只用 action 内置 verify。原一小时 npm 新候选包龄不加豁免。历史验收不自动作为当前候选通过依据。
+复用原附带 unit 和 JS 渲染 runner，新增一个样式解码 unit，并在原 JS runner 验证标量/some/none 的实际 HTML 与非法 Bool 拒绝；不增加新 checker、强转、类型预算或兼容开关。全部 188 个定义、完整 strict、6 项 unit（原 5 + 新 1）、原时间回退和 nil/false 回归、样式回归及构建在本地通过。原门禁、部署路径与一小时 npm 包龄策略保持；COS 只用 action 内置 verify。本地 JS 渲染不代表已完成浏览器动画验收。
 
 ### 渲染回归检查
 
