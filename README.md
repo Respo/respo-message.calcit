@@ -7,7 +7,9 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 使用者需要注意
 
-候选 `0.1.2` 配对正式 Calcit CLI / `@calcit/procs` `0.34.0`，依赖正式 UI `0.10.0`、Respo `0.18.0`、JS-FFI `0.2.9`（传递 Router `0.9.0`）。消费者须协调完整精确图并重新生成 JS；直接构造上游 DomProps 的代码采用 Option 字段。旧 tag 不移动，0.1.2 发布前不引用 main/hash；0.30.1 使用者继续使用 0.0.x 维护线。
+0.1.3 候选配对 Calcit CLI / JS 运行时 0.34.1，使用已发布 UI 0.12.0、Respo 0.18.0 和 JS-FFI 0.2.9。升级后重新严格安装依赖并生成 JS。
+
+消息文本改为省略可选样式参数，避免将 nil 传给后续 Respo 的 TextStyle union。此调用也兼容当前正式依赖，消息内容和布局沿用原逻辑。
 
 本次保留公开消息 Map 合同。Demo 的开发检查节点显式转换为 Option，关闭开发模式时仍不显示；检查样式使用空 Map，以适配当前及后续 Respo 的受检样式合同。
 
