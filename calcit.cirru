@@ -139,7 +139,7 @@
                           with-present :id $ get message :id
                           with-present :token $ get message :token
                         , d!
-                  <> message-text nil
+                  <> message-text
           :examples $ []
           :schema $ quote $ Fn Number (Map Dynamic Dynamic) (Map Dynamic Dynamic) Fn (-> respo.schema/Component)
         'css-message $ %{} 'CodeEntry (:doc |)
