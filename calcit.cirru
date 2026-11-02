@@ -193,15 +193,27 @@
                 _ nil
           :examples $ []
           :schema $ quote $ Fn MessageValue Number Bool (-> respo.schema/Effect) (:generics MessageValue) (:features :js-ffi)
-        'message-style-of $ %{} 'CodeEntry (:doc "|读取消息样式并校验为 map。")
+        'message-style-of $ %{} 'CodeEntry
+          :doc "|读取真实消息边界，保留缺省/nil 样式为空 Map，并校验键为 Tag、值为 StyleValue 或 Option StyleValue。"
           :code $ quote $ defn message-style-of (message)
             &let
               style $ .unwrap-or (get message :style) ({})
               if (nil? style) ({})
-                if (map? style) style $ raise "|respo-message expected :style as a map"
+                decode-map-as style $ quote $ Map Tag respo-ui.schema/InlineStyleValue
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic Dynamic)
-            -> $ Map Dynamic Dynamic
+            -> $ Map Tag respo-ui.schema/InlineStyleValue
+            :features :js-ffi
+          :tests $ [] $ %{} 'TestEntry (:name |checked-inline-style-values)
+            :code $ quote $ do
+              let
+                  style $ {} (:opacity 0.5) (:color |red)
+                    :border-color $ Option :none
+                    :outline-color $ Option :some :blue
+                assert= style $ message-style-of $ {} (:style style)
+              assert= ({})
+                message-style-of $ {} $ :style nil
+            :tags $ #{} :unit
         'message-text-of $ %{} 'CodeEntry (:doc "|读取消息文本，非字符串值按显示文本转换。")
           :code $ quote $ defn message-text-of (message)
             &let
