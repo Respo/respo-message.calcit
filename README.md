@@ -7,13 +7,15 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 使用者需要注意
 
-0.2.0 配对正式 Calcit CLI / JS 运行时 **0.34.2**，使用已发布 UI **0.14.0**、Respo **0.19.1** 和 JS-FFI **0.2.10**。升级后严格安装完整依赖图并重新生成 JS；发行状态以正式 Git tag 为准。这里验证的是 Message 自身的完整依赖图，不能仅用 UI 的源码兼容夹具代替。
+候选 **0.2.1** 配对正式 Calcit CLI / JS 运行时 **0.34.2**，对齐已发布 UI **0.14.1**、Respo **0.19.2**、JS-FFI **0.2.10** 和传递 Router **0.11.2**。消费者需要严格安装完整图并重新生成 JS；0.2.1 尚未发布。本次不改变消息样式、派发或 wire 合同。
 
-消息 `:style` 入口改为校验 `Map Tag respo-ui.schema/InlineStyleValue`：键为 Tag，值为 String、Number、Tag 或 `Option StyleValue`。整个 `:style` 缺省或 nil 仍为空 Map；单个属性的 some 会解包、none 不渲染。原来开放 Map 中的 Bool、集合、函数及单属性 nil 不符合这个合同，会在读取样式时更早拒绝；旧 nil 属性请改为 `Option :none`。因为这是公开输入的收紧，本次升 minor，不扩大 union 容纳无效 CSS 值。
+Demo 一处旧 `=< 16 nil` 改为同宽 `space-x 16`，官方 CLI 反向恢复后与原 Snapshot 字节一致：其他代码、schema、原测试与示例保持。187 个可达定义、33 个公开定义、完整 strict、原六项 unit、原 JS 时间/falsey-token/样式回归和构建通过，dynamic-method/deprecated 为零，未放宽门禁或增加 checker。实际 Chrome 已验证原 Try/Clear、点击消息删除、原 2 秒自动删除、显示样式及刷新初始化，控制台无错误，间距保持 16px。精确 Linux CI 与隔离 COS 预览仍待验收。
+
+从 0.1.x 升级时仍需注意已发布 0.2.0 的样式合同：消息 `:style` 入口改为校验 `Map Tag respo-ui.schema/InlineStyleValue`：键为 Tag，值为 String、Number、Tag 或 `Option StyleValue`。整个 `:style` 缺省或 nil 仍为空 Map；单个属性的 some 会解包、none 不渲染。原来开放 Map 中的 Bool、集合、函数及单属性 nil 不符合这个合同，会在读取样式时更早拒绝；旧 nil 属性请改为 `Option :none`。0.2.0 因这项公开输入收紧升级了 minor；0.2.1 不扩大 union 容纳无效 CSS 值。
 
 公开消息 Map 与 token/ID 优先级、nil/false token 按 ID 删除、缺失或非法时间回退、消息排序、动画、派发及页面 `hud!` 保持。真实异构消息及状态边界继续检查，不把整条消息伪装为有限 union。名义消息模型与回调全面改造不属于本次变更。
 
-复用原附带 unit 和 JS 渲染 runner，新增一个样式解码 unit，并在原 JS runner 验证标量/some/none 的实际 HTML 与非法 Bool 拒绝；不增加新 checker、强转、类型预算或兼容开关。全部 188 个定义、完整 strict、6 项 unit（原 5 + 新 1）、原时间回退和 nil/false 回归、样式回归及构建在本地通过。原门禁、部署路径与一小时 npm 包龄策略保持；COS 只用 action 内置 verify。本地 JS 渲染不代表已完成浏览器动画验收。
+复用原附带 unit 和 JS 渲染 runner，新增一个样式解码 unit，并在原 JS runner 验证标量/some/none 的实际 HTML 与非法 Bool 拒绝；不增加新 checker、强转、类型预算或兼容开关。0.2.0 当时的 188 个定义、完整 strict、6 项 unit（原 5 + 新 1）、原时间回退和 nil/false 回归、样式回归及构建在本地通过。原门禁、部署路径与一小时 npm 包龄策略保持；COS 只用 action 内置 verify。本地 JS 渲染不代表已完成浏览器动画验收。
 
 ### 渲染回归检查
 

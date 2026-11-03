@@ -86,7 +86,7 @@
                             , 2000
                           , &unit
                     <> |Try
-                  =< 16 nil
+                  space-x 16
                   button
                     {} (:class-name css/button)
                       :on-click $ fn (e d!)
@@ -106,7 +106,7 @@
             respo-ui.css :as css
             respo.core :refer $ defcomp div span button <>
             respo-ui.core :as ui
-            respo.comp.space :refer $ =<
+            respo.comp.space :refer $ space-x
             respo-message.comp.messages :refer $ comp-messages
             respo-message.schema :as schema
             |lorem-ipsum :as lorem-ipsum
