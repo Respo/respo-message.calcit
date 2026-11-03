@@ -7,7 +7,7 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 使用者需要注意
 
-0.1.3 候选配对 Calcit CLI / JS 运行时 0.34.1，使用已发布 UI 0.12.0、Respo 0.18.0 和 JS-FFI 0.2.9。升级后重新严格安装依赖并生成 JS。
+0.1.4 是 0.1 维护线补丁：配对 Calcit CLI / JS 运行时 0.34.3，依赖 UI 0.12.1、Respo 0.18.1 和 JS-FFI 0.2.9，与 Reel 0.8.1、Alerts 0.11.3、Recollect 0.2.1 组成同一条 Respo 0.18.1 兼容线（`caps --strict` 要求同一包只出现一个版本）。源码不变；需要 Respo 0.19.1 的项目请用 0.2.x。升级后重新严格安装依赖并生成 JS。
 
 消息文本改为省略可选样式参数，避免将 nil 传给后续 Respo 的 TextStyle union。此调用也兼容当前正式依赖，消息内容和布局沿用原逻辑。
 
