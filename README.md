@@ -5,7 +5,16 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### 0.3.0 候选：使用者需要注意
+### 0.3.1 候选：使用者需要注意
+
+CLI / `@calcit/procs` 同步正式 **0.35.1**，UI **0.15.1**、Respo **0.19.4**、
+JS-FFI **0.2.13** / 传递 Router **0.12.1** 需统一精确图并重新生成 JS。
+相对已合并 #71 main，Snapshot、原测试/工作流/门禁和部署路径保持。
+已有 `with-present` 泛型关系和受检 CSS union 保留；消息 ID/token/payload 的
+真实开放边界不伪造为有限 union。`AnyEnum` 沿用 #71 名称，不声称边界已完全类型化。
+本候选不改变删除、排序、动画、wire、存档或 HUD 行为，精确验收结果见 PR / main CI。
+
+### 历史 0.3.0 配对
 
 CLI / `@calcit/procs` 同步正式 **0.35.0**，UI **0.15.0**、Respo **0.19.3**、
 JS-FFI **0.2.12** / 传递 Router **0.12.0** 需统一精确图并重新生成 JS。
