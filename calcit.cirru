@@ -141,7 +141,7 @@
                         , d!
                   <> message-text
           :examples $ []
-          :schema $ quote $ Fn Number (Map Dynamic Dynamic) (Map Dynamic Dynamic) Fn (-> respo.schema/Component)
+          :schema $ quote $ Fn Number (Map Dynamic Dynamic) (Map Dynamic Dynamic) AnyFn (-> respo.schema/Component)
         'css-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-message
             {} $ |$0 $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size 14)
@@ -272,7 +272,7 @@
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? false
               fn (info) nil
-          :schema $ quote $ Fn (Map String Dynamic) (Map Dynamic Dynamic) Fn (-> respo.schema/Component)
+          :schema $ quote $ Fn (Map String Dynamic) (Map Dynamic Dynamic) AnyFn (-> respo.schema/Component)
         'message-entries $ %{} 'CodeEntry (:doc "|去重并校验消息条目为 map。")
           :code $ quote $ defn message-entries (messages)
             foldl
@@ -353,7 +353,7 @@
               reset! *store $ next-store-of op op-id op-time
               , &unit
           :examples $ []
-          :schema $ quote $ Fn Enum (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn AnyEnum (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -402,7 +402,7 @@
                       Map Dynamic Dynamic
                   _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
-          :schema $ quote $ Fn Enum String Number
+          :schema $ quote $ Fn AnyEnum String Number
             -> $ Map Dynamic Dynamic
             :features :js-ffi
           :tests $ []
