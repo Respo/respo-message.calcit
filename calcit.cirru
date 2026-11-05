@@ -64,7 +64,7 @@
                     (:some value)
                       either value $ {}
                     (:none) ({})
-                  quote $ Map String Dynamic
+                  Map String Dynamic
               div
                 {}
                   :class-name $ str-spaced css/global css/fullscreen
@@ -199,7 +199,7 @@
             &let
               style $ .unwrap-or (get message :style) ({})
               if (nil? style) ({})
-                decode-map-as style $ quote $ Map Tag respo-ui.schema/InlineStyleValue
+                decode-map-as style $ Map Tag respo-ui.schema/InlineStyleValue
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic Dynamic)
             -> $ Map Tag respo-ui.schema/InlineStyleValue
@@ -229,8 +229,9 @@
                 if (nil? value) m $ assoc m k value
               (:none) m
           :examples $ []
-          :schema $ quote $ Fn (Map Tag Dynamic) Tag (Option Dynamic)
-            -> $ Map Tag Dynamic
+          :schema $ quote $ Fn (Map Tag V) Tag (Option V)
+            -> $ Map Tag V
+            :generics V
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.message
           :require
@@ -384,7 +385,7 @@
                           (:some value)
                             either value $ {}
                           (:none) ({})
-                        quote $ Map Dynamic Dynamic
+                        Map Dynamic Dynamic
                       &enum:nth op 0
                       if
                         > (&enum:count op) 1
@@ -396,9 +397,9 @@
                   (:states cursor s)
                     decode-map-as
                       update-states store
-                        decode-map-as cursor $ quote $ List Dynamic
+                        decode-map-as cursor $ List Dynamic
                         , s
-                      quote $ Map Dynamic Dynamic
+                      Map Dynamic Dynamic
                   _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
           :schema $ quote $ Fn Enum String Number
@@ -489,11 +490,11 @@
                 {}
               (&= op action/create)
                 .assoc messages op-id $ &merge
-                  &merge schema/message $ decode-map-as op-data $ quote (Map Tag Dynamic)
+                  &merge schema/message $ decode-map-as op-data $ Map Tag Dynamic
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
                 let
-                    data $ decode-map-as op-data $ quote (Map Dynamic Dynamic)
+                    data $ decode-map-as op-data $ Map Dynamic Dynamic
                     token $ match (get data :token)
                       (:some value)
                         if value (Option :some value) (Option :none)
@@ -505,7 +506,7 @@
                         filter $ fn (pair)
                           let[] (k message) pair $ not= (Option :some token-value)
                             get
-                              decode-map-as message $ quote $ Map Dynamic Dynamic
+                              decode-map-as message $ Map Dynamic Dynamic
                               , :token
                         .to-list
                         pairs-map

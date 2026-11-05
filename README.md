@@ -5,7 +5,22 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### 使用者需要注意
+### 0.3.0 候选：使用者需要注意
+
+CLI / `@calcit/procs` 同步正式 **0.35.0**，UI **0.15.0**、Respo **0.19.3**、
+JS-FFI **0.2.12** / 传递 Router **0.12.0** 需统一精确图并重新生成 JS。
+`with-present` 的类型改为泛型 `Map Tag V -> Map Tag V`，不再主动擦除 V；
+直接调用该 helper 时，异构值应有共同的 union 或真实开放值上下文。
+因此按 minor 发布；消息组件、删除优先级、排序、时间回退、动画与 wire 行为保持。
+
+helper 的函数体不变，三处显式 schema Dynamic 被 V 贯穿；同一个受检 CSS union
+调用的静态结果精确保持 `Map Tag InlineStyleValue`。实际消息 ID/token 仍是开放值，
+原 payload 正确保持 `Map Tag Dynamic`，不宣称所有消息数据已闭合。
+其余源码只由官方 formatter 迁移类型写法；原测试、门禁、预算与部署路径保留。
+本轮精确检查结果见 PR；历史数字不代表本轮验收。
+
+### 0.2.1 历史配对
+
 
 候选 **0.2.1** 配对正式 Calcit CLI / JS 运行时 **0.34.2**，对齐已发布 UI **0.14.1**、Respo **0.19.2**、JS-FFI **0.2.10** 和传递 Router **0.11.2**。消费者需要严格安装完整图并重新生成 JS；0.2.1 尚未发布。本次不改变消息样式、派发或 wire 合同。
 
