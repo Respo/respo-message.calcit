@@ -5,7 +5,16 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### 0.3.1 候选：使用者需要注意
+### 0.4.0 候选的移除回调
+
+`comp-messages` 与 `comp-message` 的移除回调接收两个参数，即 `(info d!)`。
+如果旧回调只声明了 `info`，请补上第二个参数。分发函数按宿主的 `dispatch-op` 类型槽检查，
+回调结果仍会被忽略。
+
+`info` 仍是 Tag 键 Map，包含 `:index`、`:time`，以及存在且非 nil 的 `:id`、`:token`。
+后两者保留旧数据的值类型。原排序、点击删除和动画保持。
+
+### 历史 0.3.1 配对
 
 CLI / `@calcit/procs` 同步正式 **0.35.1**，UI **0.15.1**、Respo **0.19.4**、
 JS-FFI **0.2.13** / 传递 Router **0.12.1** 需统一精确图并重新生成 JS。

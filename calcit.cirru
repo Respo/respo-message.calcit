@@ -133,15 +133,24 @@
                       {} (:top 8)
                         :transform $ str "|translate(0," (* idx 40) "|px)"
                     :on-click $ fn (e d!)
+                      hint-fn $ Fn respo.schema/RespoEvent
+                        Fn *dispatch-op $ -> Unit
+                        -> Unit
                       on-remove!
                         ->
                           {} (:index idx) (:time message-timestamp)
                           with-present :id $ get message :id
                           with-present :token $ get message :token
                         , d!
+                      , &unit
                   <> message-text
           :examples $ []
-          :schema $ quote $ Fn Number (Map Dynamic Dynamic) (Map Dynamic Dynamic) AnyFn (-> respo.schema/Component)
+          :schema $ quote $ Fn Number (Map Dynamic Dynamic) (Map Dynamic Dynamic)
+            Fn (Map Tag Dynamic)
+              Fn *dispatch-op $ -> Unit
+              -> R
+            -> respo.schema/Component
+            :generics R
         'css-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-message
             {} $ |$0 $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size 14)
@@ -268,11 +277,16 @@
           :examples $ []
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? true
-              fn (info) nil
+              fn (info d!) &unit
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? false
-              fn (info) nil
-          :schema $ quote $ Fn (Map String Dynamic) (Map Dynamic Dynamic) AnyFn (-> respo.schema/Component)
+              fn (info d!) &unit
+          :schema $ quote $ Fn (Map String Dynamic) (Map Dynamic Dynamic)
+            Fn (Map Tag Dynamic)
+              Fn *dispatch-op $ -> Unit
+              -> R
+            -> respo.schema/Component
+            :generics R
         'message-entries $ %{} 'CodeEntry (:doc "|去重并校验消息条目为 map。")
           :code $ quote $ defn message-entries (messages)
             foldl
