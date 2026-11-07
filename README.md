@@ -7,7 +7,7 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 0.4.0 候选：Calcit 0.37.0
 
-CLI / `@calcit/procs` 配对正式 **0.37.0**，UI **0.15.2**、Respo **0.19.5**、JS-FFI **0.2.14** / 传递 Router **0.12.2**。
+CLI / `@calcit/procs` 配对正式 **0.37.0**，UI **0.15.2**、Respo **0.19.5**、JS-FFI **0.2.13**（与 Respo 0.19.5 一致）/ 传递 Router **0.12.2**。
 0.37 不再把 `Dynamic` 当作已绑定的类型槽，示例入口的 `:dispatch-op` 改绑新增的 `respo-message.schema/Op` 枚举，
 `dispatch!` 与渲染回调都按它检查。`action/create`、`action/clear`、`action/remove-one` 改为字面 Tag
 `:message/create`、`:message/clear`、`:message/remove-one`，继续通过 `action/...` 引用的代码不用改。
