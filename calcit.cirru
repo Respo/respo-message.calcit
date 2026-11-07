@@ -6,20 +6,20 @@
     {} (:description |) (:init-fn 'respo-message.main/main!) (:mode :js) (:reload-fn 'respo-message.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |js-ffi/
-      :type-slots $ {} $ :dispatch-op 'Dynamic
+      :type-slots $ {} $ :dispatch-op 'respo-message.schema/Op
   :files $ {}
     'respo-message.action $ %{} 'FileEntry
       :defs $ {}
         'clear $ %{} 'CodeEntry
           :doc "|Action tag for clearing all messages. Use it with dispatch! to remove all displayed messages at once."
-          :code $ quote $ def clear (gen-tag |message/clear)
+          :code $ quote $ def clear :message/clear
           :examples $ []
             quote $ assert= true $ tag? respo-message.action/clear
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/clear
           :schema $ quote Tag
         'create $ %{} 'CodeEntry
           :doc "|Action tag for creating a new message. Use it with dispatch! to display a toast message."
-          :code $ quote $ def create (gen-tag |message/create)
+          :code $ quote $ def create :message/create
           :examples $ []
             quote $ assert= true $ tag? respo-message.action/create
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/create
@@ -47,7 +47,7 @@
           :schema $ quote $ Fn Dynamic (-> Bool)
         'remove-one $ %{} 'CodeEntry
           :doc "|Action tag for removing a specific message. Messages can be identified by :id or :token field."
-          :code $ quote $ def remove-one (gen-tag |message/remove-one)
+          :code $ quote $ def remove-one :message/remove-one
           :examples $ []
             quote $ assert= true $ tag? respo-message.action/remove-one
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/remove-one
@@ -367,7 +367,7 @@
               reset! *store $ next-store-of op op-id op-time
               , &unit
           :examples $ []
-          :schema $ quote $ Fn AnyEnum (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn respo-message.schema/Op (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -416,7 +416,7 @@
                       Map Dynamic Dynamic
                   _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
-          :schema $ quote $ Fn AnyEnum String Number
+          :schema $ quote $ Fn respo-message.schema/Op String Number
             -> $ Map Dynamic Dynamic
             :features :js-ffi
           :tests $ []
@@ -445,12 +445,11 @@
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! (renderer)
             renderer (mount-target) (comp-container @*store)
-              fn (op)
-                if (enum? op) (dispatch! op) (raise |Expected-message-operation-enum)
+              fn (op) (dispatch! op)
           :examples $ []
           :schema $ quote $ Fn
             Fn (JsNullish respo.dom/DomElement) respo.schema/Component
-              Fn Dynamic $ -> Unit
+              Fn respo-message.schema/Op $ -> Unit
               -> Unit
             -> Unit
       :ns $ %{} 'NsEntry (:doc |)
@@ -470,6 +469,15 @@
             respo.ffi.browser :as dom
     'respo-message.schema $ %{} 'FileEntry
       :defs $ {}
+        'Op $ %{} 'CodeEntry
+          :doc "|Dispatch Op of the message demo, bound to the :dispatch-op type slot. Message actions carry an optional payload map; :states carries the Respo cursor update."
+          :code $ quote $ defenum Op
+            :states (List Dynamic) Dynamic
+            :message/create $ Map Tag Dynamic
+            :message/clear
+            :message/remove-one $ Map Tag Dynamic
+          :examples $ [] $ quote (%:: respo-message.schema/Op :message/clear)
+          :schema $ quote EnumDef
         'message $ %{} 'CodeEntry
           :doc "|Schema definition for a message object. Contains :id (auto-generated), :token (optional user-defined), :text (message content), :time (creation timestamp), and :style (custom CSS styles)."
           :code $ quote $ def message
