@@ -76,12 +76,12 @@
                       :on-click $ fn (e d!)
                         let
                             new-token $ generate-id!
-                          d! $ :: action/create $ &merge schema/message
+                          d! $ schema/Op :message/create $ &merge schema/message
                             {} (:token new-token)
                               :text $ lorem-ipsum/loremIpsum
                           browser/set-timeout!
                             fn ()
-                              d! $ :: action/remove-one $ {} (:token new-token)
+                              d! $ schema/Op :message/remove-one $ {} (:token new-token)
                               , &unit
                             , 2000
                           , &unit
@@ -90,12 +90,12 @@
                   button
                     {} (:class-name css/button)
                       :on-click $ fn (e d!)
-                        d! $ :: action/clear
+                        d! $ schema/Op :message/clear
                     <> |Clear
                 comp-messages messages
                   {} $ :bottom? false
                   fn (info d!)
-                    d! $ :: action/remove-one info
+                    d! $ schema/Op :message/remove-one info
                 nil->option $ when config/dev? $ comp-inspect |messages messages ({})
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic Dynamic) (-> respo.schema/Component) (:features :js-ffi)
@@ -374,7 +374,7 @@
             render-app! render!
             add-watch! *store :changes $ fn (store prev) (render-app! render!)
             browser/set-timeout!
-              fn () $ dispatch! $ :: action/create
+              fn () $ dispatch! $ schema/Op :message/create
                 {} $ :text $ lorem-ipsum/loremIpsum
               , 0
             println "|app started!"
@@ -390,31 +390,25 @@
           :code $ quote $ defn next-store-of (op op-id op-time)
             let
                 store @*store
-              if
-                action/message-action? $ &enum:nth op 0
-                let
-                    next-messages $ update-messages
-                      decode-map-as
+                apply-action $ fn (action payload)
+                  hint-fn $ Fn Tag (Map Tag Dynamic)
+                    -> $ Map Dynamic Dynamic
+                  let
+                      messages $ decode-map-as
                         match (get store :messages)
                           (:some value)
                             either value $ {}
                           (:none) ({})
                         Map Dynamic Dynamic
-                      &enum:nth op 0
-                      if
-                        > (&enum:count op) 1
-                        &enum:nth op 1
-                        {}
-                      , op-id op-time
-                  .assoc store :messages next-messages
-                match op
-                  (:states cursor s)
-                    decode-map-as
-                      update-states store
-                        decode-map-as cursor $ List Dynamic
-                        , s
-                      Map Dynamic Dynamic
-                  _ $ do (eprintln "|Unhandled operation:" op) store
+                    .assoc store :messages $ update-messages messages action payload op-id op-time
+              match op
+                (:message/create payload) (apply-action action/create payload)
+                (:message/remove-one payload) (apply-action action/remove-one payload)
+                (:message/clear)
+                  apply-action action/clear $ {}
+                (:states cursor state)
+                  decode-map-as (update-states store cursor state) (Map Dynamic Dynamic)
+                _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
           :schema $ quote $ Fn respo-message.schema/Op String Number
             -> $ Map Dynamic Dynamic
@@ -436,9 +430,33 @@
                     [] :messages |id-1 :text
                   , nil
               :tags $ #{} :fast :unit
+            %{} 'TestEntry (:name |typed-remove-one)
+              :code $ quote $ let
+                  original @*store
+                  seeded $ next-store-of
+                    schema/Op :message/create $ {} (:text |Hello) (:token |remove-me)
+                    , |id-message 1
+                reset! *store seeded
+                let
+                    result $ next-store-of
+                      schema/Op :message/remove-one $ {} $ :token |remove-me
+                      , |id-remove 2
+                  reset! *store original
+                  assert=
+                    Option :some $ {}
+                    get result :messages
+              :tags $ #{} :fast :unit
+            %{} 'TestEntry (:name |typed-states)
+              :code $ quote $ assert= (Result :ok false)
+                get-in
+                  next-store-of
+                    schema/Op :states ([] :panel) false
+                    , |id-states 1
+                  [] :states :panel :data
+              :tags $ #{} :fast :unit
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
-            dispatch! $ :: action/create $ {}
+            dispatch! $ schema/Op :message/create $ {}
               :text $ lorem-ipsum/loremIpsum
           :examples $ []
           :schema $ quote $ Fn (-> Unit)
@@ -472,7 +490,7 @@
         'Op $ %{} 'CodeEntry
           :doc "|Dispatch Op of the message demo, bound to the :dispatch-op type slot. Message actions carry an optional payload map; :states carries the Respo cursor update."
           :code $ quote $ defenum Op
-            :states (List Dynamic) Dynamic
+            :states (List respo.schema/CoordKey) Dynamic
             :message/create $ Map Tag Dynamic
             :message/clear
             :message/remove-one $ Map Tag Dynamic
