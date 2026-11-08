@@ -430,6 +430,30 @@
                     [] :messages |id-1 :text
                   , nil
               :tags $ #{} :fast :unit
+            %{} 'TestEntry (:name |typed-remove-one)
+              :code $ quote $ let
+                  original @*store
+                  seeded $ next-store-of
+                    schema/Op :message/create $ {} (:text |Hello) (:token |remove-me)
+                    , |id-message 1
+                reset! *store seeded
+                let
+                    result $ next-store-of
+                      schema/Op :message/remove-one $ {} $ :token |remove-me
+                      , |id-remove 2
+                  reset! *store original
+                  assert=
+                    Option :some $ {}
+                    get result :messages
+              :tags $ #{} :fast :unit
+            %{} 'TestEntry (:name |typed-states)
+              :code $ quote $ assert= (Result :ok false)
+                get-in
+                  next-store-of
+                    schema/Op :states ([] :panel) false
+                    , |id-states 1
+                  [] :states :panel :data
+              :tags $ #{} :fast :unit
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! () (clear-cache!) (render-app! render!) (println "|Code update.")
             dispatch! $ schema/Op :message/create $ {}
