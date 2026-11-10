@@ -258,7 +258,7 @@
           :code $ quote $ defcomp comp-messages (messages options on-remove!)
             let
                 bottom? $ = true $ .unwrap-or (get options :bottom?) false
-              list->
+              keyed->
                 {} $ :style $ if bottom?
                   {} (:position :fixed) (:bottom 0) (:right 0)
                   {} (:position :fixed) (:top 0) (:right 0)
@@ -267,10 +267,9 @@
                     hint-fn $ Fn (Map Dynamic Dynamic) (Map Dynamic Dynamic) (-> Number)
                     - (message-time m) (message-time message)
                   map-indexed $ fn (idx message)
-                    hint-fn $ Fn Number (Map Dynamic Dynamic)
-                      -> $ List Dynamic
-                    []
-                      match (get message :id)
+                    hint-fn $ Fn Number (Map Dynamic Dynamic) (-> respo.schema/ChildPair)
+                    keyed-component
+                      read-coord-key $ match (get message :id)
                         (:some id) (if id id |)
                         (:none) |
                       comp-message idx message options on-remove!
@@ -312,8 +311,9 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.messages
           :require
-            respo.core :refer $ defcomp list-> div span <>
+            respo.core :refer $ defcomp keyed-> keyed-component div span <>
             respo-message.comp.message :refer $ comp-message
+            respo.util.list :refer $ read-coord-key
     'respo-message.config $ %{} 'FileEntry
       :defs $ {}
         'cdn? $ %{} 'CodeEntry (:doc |)
