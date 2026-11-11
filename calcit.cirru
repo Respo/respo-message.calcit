@@ -205,31 +205,33 @@
         'message-style-of $ %{} 'CodeEntry
           :doc "|读取真实消息边界，保留缺省/nil 样式为空 Map，并校验键为 Tag、值为 StyleValue 或 Option StyleValue。"
           :code $ quote $ defn message-style-of (message)
-            &let
-              style $ .unwrap-or (get message :style) ({})
-              if (nil? style) ({})
-                decode-map-as style $ Map Tag respo-ui.schema/InlineStyleValue
+            match (get message :style)
+              (:some style)
+                if (nil? style) ({})
+                  decode-map-as style $ Map Tag respo-ui.schema/InlineStyleValue
+              (:none) ({})
           :examples $ []
-          :schema $ quote $ Fn (Map Dynamic Dynamic)
+          :schema $ quote $ Fn (Map Dynamic MessageValue)
             -> $ Map Tag respo-ui.schema/InlineStyleValue
+            :generics MessageValue
             :features :js-ffi
           :tests $ [] $ %{} 'TestEntry (:name |checked-inline-style-values)
             :code $ quote $ do
               let
-                  style $ {} (:opacity 0.5) (:color |red)
-                    :border-color $ Option :none
-                    :outline-color $ Option :some :blue
+                  style $ {} (:opacity 0.5) (:color |red) (:border-color None)
+                    :outline-color $ Some :blue
                 assert= style $ message-style-of $ {} (:style style)
               assert= ({})
                 message-style-of $ {} $ :style nil
             :tags $ #{} :unit
         'message-text-of $ %{} 'CodeEntry (:doc "|读取消息文本，非字符串值按显示文本转换。")
           :code $ quote $ defn message-text-of (message)
-            &let
-              text $ .unwrap-or (get message :text) |
-              if (string? text) text $ if (nil? text) | $ str text
+            match (get message :text)
+              (:some text)
+                if (string? text) text $ if (nil? text) | $ str text
+              (:none) |
           :examples $ []
-          :schema $ quote $ Fn (Map Dynamic Dynamic) (-> String)
+          :schema $ quote $ Fn (Map Dynamic MessageValue) (-> String) (:generics MessageValue)
         'with-present $ %{} 'CodeEntry
           :doc "|Add k when the value is present and not nil; otherwise keep the map, so a removal payload only carries the fields the message has."
           :code $ quote $ defn with-present (m k value-option)
@@ -303,11 +305,12 @@
             -> $ List $ Map Dynamic Dynamic
         'message-time $ %{} 'CodeEntry (:doc "|读取消息时间用于排序，缺失或非数字时为 0。")
           :code $ quote $ defn message-time (message)
-            &let
-              t $ .unwrap-or (get message :time) 0
-              if (number? t) t 0
+            match (get message :time)
+              (:some t)
+                if (number? t) t 0
+              (:none) 0
           :examples $ []
-          :schema $ quote $ Fn (Map Dynamic Dynamic) (-> Number)
+          :schema $ quote $ Fn (Map Dynamic MessageValue) (-> Number) (:generics MessageValue)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.messages
           :require
@@ -367,7 +370,7 @@
               reset! *store $ next-store-of op op-id op-time
               , &unit
           :examples $ []
-          :schema $ quote $ Fn respo-message.schema/Op (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn schema/Op (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -410,7 +413,7 @@
                   decode-map-as (update-states store cursor state) (Map Dynamic Dynamic)
                 _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
-          :schema $ quote $ Fn respo-message.schema/Op String Number
+          :schema $ quote $ Fn schema/Op String Number
             -> $ Map Dynamic Dynamic
             :features :js-ffi
           :tests $ []
@@ -443,7 +446,7 @@
                       , |id-remove 2
                   reset! *store original
                   assert=
-                    Option :some $ {}
+                    Some $ {}
                     get result :messages
               :tags $ #{} :fast :unit
             %{} 'TestEntry (:name |typed-states)
@@ -467,7 +470,7 @@
           :examples $ []
           :schema $ quote $ Fn
             Fn (JsNullish respo.dom/DomElement) respo.schema/Component
-              Fn respo-message.schema/Op $ -> Unit
+              Fn schema/Op $ -> Unit
               -> Unit
             -> Unit
       :ns $ %{} 'NsEntry (:doc |)
@@ -537,14 +540,14 @@
                     data $ decode-map-as op-data $ Map Dynamic Dynamic
                     token $ match (get data :token)
                       (:some value)
-                        if value (Option :some value) (Option :none)
-                      (:none) (Option :none)
+                        if value (Some value) None
+                      (:none) None
                     message-id $ get data :id
                   match token
                     (:some token-value)
                       -> messages (.to-pairs)
                         filter $ fn (pair)
-                          let[] (k message) pair $ not= (Option :some token-value)
+                          let[] (k message) pair $ not= (Some token-value)
                             get
                               decode-map-as message $ Map Dynamic Dynamic
                               , :token

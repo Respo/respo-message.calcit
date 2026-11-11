@@ -5,9 +5,9 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### Calcit 0.40.0
+### Calcit 0.41.0
 
-升级源码后请配对正式 Calcit CLI 与 `@calcit/procs` 0.40.0，再生成 JS。
+升级源码后请配对正式 Calcit CLI 与 `@calcit/procs` 0.41.0，再生成 JS。
 Demo 使用具名 `Op` 分派创建、移除和清空，状态更新使用 Respo `CoordKey` 路径。
 库的 `update-messages` 调用形状、消息 Map 和旧数据兼容性沿用原约定。
 
