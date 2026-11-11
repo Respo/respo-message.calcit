@@ -44,7 +44,7 @@
           :examples $ []
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/create
             quote $ assert= false $ respo-message.action/message-action? :unknown-action
-          :schema $ quote $ Fn Dynamic (-> Bool)
+          :schema $ quote $ Fn T (-> Bool) (:generics T)
         'remove-one $ %{} 'CodeEntry
           :doc "|Action tag for removing a specific message. Messages can be identified by :id or :token field."
           :code $ quote $ def remove-one :message/remove-one
