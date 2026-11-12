@@ -98,7 +98,7 @@
                     d! $ schema/Op :message/remove-one info
                 nil->option $ when config/dev? $ comp-inspect |messages messages ({})
           :examples $ []
-          :schema $ quote $ Fn (Map Dynamic Dynamic) (-> respo.schema/Component) (:features :js-ffi)
+          :schema $ quote $ Fn (Map Dynamic Dynamic) (-> respo.schema/Component) (:features :js-ffi :state)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.container
           :require
@@ -370,7 +370,7 @@
               reset! *store $ next-store-of op op-id op-time
               , &unit
           :examples $ []
-          :schema $ quote $ Fn schema/Op (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn schema/Op (-> Unit) (:features :io :js-ffi :state)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -383,7 +383,7 @@
             println "|app started!"
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn mount-target ()
             .unwrap $ dom/query-selector |.app
@@ -415,7 +415,7 @@
           :examples $ []
           :schema $ quote $ Fn schema/Op String Number
             -> $ Map Dynamic Dynamic
-            :features :js-ffi
+            :features :io :js-ffi :state
           :tests $ []
             %{} 'TestEntry (:name |clear-without-payload)
               :code $ quote $ assert= ({})
@@ -462,7 +462,7 @@
             dispatch! $ schema/Op :message/create $ {}
               :text $ lorem-ipsum/loremIpsum
           :examples $ []
-          :schema $ quote $ Fn (-> Unit)
+          :schema $ quote $ Fn (-> Unit) (:features :io :state)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! (renderer)
             renderer (mount-target) (comp-container @*store)
@@ -473,6 +473,7 @@
               Fn schema/Op $ -> Unit
               -> Unit
             -> Unit
+            :features :io :state
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.main
           :require
@@ -493,12 +494,17 @@
         'Op $ %{} 'CodeEntry
           :doc "|Dispatch Op of the message demo, bound to the :dispatch-op type slot. Message actions carry an optional payload map; :states carries the Respo cursor update."
           :code $ quote $ defenum Op
-            :states (List respo.schema/CoordKey) Dynamic
+            :states (List respo.schema/CoordKey) StateValue
             :message/create $ Map Tag Dynamic
             :message/clear
             :message/remove-one $ Map Tag Dynamic
           :examples $ [] $ quote (%:: respo-message.schema/Op :message/clear)
           :schema $ quote EnumDef
+        'StateValue $ %{} 'CodeEntry
+          :doc "|Recursive cursor values used by the message demo."
+          :code $ quote $ defunion StateValue Bool Number String Tag (List StateValue) (Map respo.schema/CoordKey StateValue)
+          :examples $ []
+          :schema $ quote UnionDef
         'message $ %{} 'CodeEntry
           :doc "|Schema definition for a message object. Contains :id (auto-generated), :token (optional user-defined), :text (message content), :time (creation timestamp), and :style (custom CSS styles)."
           :code $ quote $ def message
