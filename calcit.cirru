@@ -296,13 +296,14 @@
               defn %message-entry (acc message)
                 hint-fn $ Fn
                   List $ Map Dynamic Dynamic
-                  , Dynamic $ ->
+                  , Entry $ ->
                     List $ Map Dynamic Dynamic
                 if (map? message) (.append acc message)
                   raise $ str "|respo-message expected each message as a map, got: " $ type-of message
           :examples $ []
-          :schema $ quote $ Fn (Map String Dynamic)
+          :schema $ quote $ Fn (Map String Entry)
             -> $ List $ Map Dynamic Dynamic
+            :generics Entry
         'message-time $ %{} 'CodeEntry (:doc "|读取消息时间用于排序，缺失或非数字时为 0。")
           :code $ quote $ defn message-time (message)
             match (get message :time)
