@@ -296,13 +296,14 @@
               defn %message-entry (acc message)
                 hint-fn $ Fn
                   List $ Map Dynamic Dynamic
-                  , Dynamic $ ->
+                  , Entry $ ->
                     List $ Map Dynamic Dynamic
                 if (map? message) (.append acc message)
                   raise $ str "|respo-message expected each message as a map, got: " $ type-of message
           :examples $ []
-          :schema $ quote $ Fn (Map String Dynamic)
+          :schema $ quote $ Fn (Map String Entry)
             -> $ List $ Map Dynamic Dynamic
+            :generics Entry
         'message-time $ %{} 'CodeEntry (:doc "|读取消息时间用于排序，缺失或非数字时为 0。")
           :code $ quote $ defn message-time (message)
             match (get message :time)
@@ -543,7 +544,7 @@
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
                 let
-                    data $ decode-map-as op-data $ Map Dynamic Dynamic
+                    data $ if (map? op-data) op-data $ raise "|respo-message expected a removal payload map"
                     token $ match (get data :token)
                       (:some value)
                         if value (Some value) None
@@ -551,14 +552,14 @@
                     message-id $ get data :id
                   match token
                     (:some token-value)
-                      -> messages (.to-pairs)
-                        filter $ fn (pair)
-                          let[] (k message) pair $ not= (Some token-value)
+                      filter-map-kv messages $ fn (key message)
+                        if
+                          = (Some token-value)
                             get
-                              decode-map-as message $ Map Dynamic Dynamic
+                              if (map? message) message $ raise "|respo-message expected each message as a map"
                               , :token
-                        .to-list
-                        pairs-map
+                          MapEntryDecision :drop
+                          MapEntryDecision :keep key message
                     (:none)
                       match message-id
                         (:some id)
@@ -574,8 +575,9 @@
               respo-message.updater/update-messages
                 {} $ :id-1 $ {} (:text |Old)
                 , respo-message.action/clear nil |id-2 1234567891
-          :schema $ quote $ Fn (Map Dynamic Dynamic) Dynamic Dynamic Dynamic Dynamic
+          :schema $ quote $ Fn (Map Dynamic Dynamic) Action Payload Id Timestamp
             -> $ Map Dynamic Dynamic
+            :generics Action Payload Id Timestamp
           :tests $ []
             %{} 'TestEntry (:name |creates-message)
               :code $ quote $ assert= 1
