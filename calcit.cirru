@@ -552,14 +552,14 @@
                     message-id $ get data :id
                   match token
                     (:some token-value)
-                      -> messages (.to-pairs)
-                        filter $ fn (pair)
-                          let[] (k message) pair $ not= (Some token-value)
+                      filter-map-kv messages $ fn (key message)
+                        if
+                          = (Some token-value)
                             get
                               decode-map-as message $ Map Dynamic Dynamic
                               , :token
-                        .to-list
-                        pairs-map
+                          MapEntryDecision :drop
+                          MapEntryDecision :keep key message
                     (:none)
                       match message-id
                         (:some id)
