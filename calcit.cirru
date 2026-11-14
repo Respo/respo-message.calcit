@@ -544,7 +544,7 @@
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
                 let
-                    data $ decode-map-as op-data $ Map Dynamic Dynamic
+                    data $ if (map? op-data) op-data $ raise "|respo-message expected a removal payload map"
                     token $ match (get data :token)
                       (:some value)
                         if value (Some value) None
