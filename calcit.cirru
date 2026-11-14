@@ -575,9 +575,9 @@
               respo-message.updater/update-messages
                 {} $ :id-1 $ {} (:text |Old)
                 , respo-message.action/clear nil |id-2 1234567891
-          :schema $ quote $ Fn (Map Dynamic Dynamic) Action Payload Dynamic Timestamp
+          :schema $ quote $ Fn (Map Dynamic Dynamic) Action Payload Id Timestamp
             -> $ Map Dynamic Dynamic
-            :generics Action Payload Timestamp
+            :generics Action Payload Id Timestamp
           :tests $ []
             %{} 'TestEntry (:name |creates-message)
               :code $ quote $ assert= 1
