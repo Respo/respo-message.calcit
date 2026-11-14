@@ -556,7 +556,7 @@
                         if
                           = (Some token-value)
                             get
-                              decode-map-as message $ Map Dynamic Dynamic
+                              if (map? message) message $ raise "|respo-message expected each message as a map"
                               , :token
                           MapEntryDecision :drop
                           MapEntryDecision :keep key message
