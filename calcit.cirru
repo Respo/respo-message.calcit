@@ -119,7 +119,10 @@
         'comp-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-message (idx message options on-remove!)
             let
-                bottom? $ = true $ .unwrap-or (get options :bottom?) false
+                bottom? $ match (get options :bottom?)
+                  (:some value)
+                    if (bool? value) value false
+                  (:none) false
                 message-style $ message-style-of message
                 message-timestamp $ message-time message
                 message-text $ message-text-of message
@@ -145,12 +148,12 @@
                       , &unit
                   <> message-text
           :examples $ []
-          :schema $ quote $ Fn Number (Map Dynamic Dynamic) (Map Dynamic Dynamic)
+          :schema $ quote $ Fn Number (Map Dynamic Dynamic) (Map Dynamic OptionValue)
             Fn (Map Tag Dynamic)
               Fn *dispatch-op $ -> Unit
               -> R
             -> respo.schema/Component
-            :generics R
+            :generics OptionValue R
         'css-message $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-message
             {} $ |$0 $ {} (:position :absolute) (:right 8) (:height 32) (:line-height |32px) (:font-size 14)
@@ -259,7 +262,10 @@
           :doc "|Respo component that renders a list of toast messages. Pass messages map, options (with :bottom? flag for positioning), and on-remove! callback. Messages are auto-sorted by time (newest first) and rendered at fixed position (top-right or bottom-right)."
           :code $ quote $ defcomp comp-messages (messages options on-remove!)
             let
-                bottom? $ = true $ .unwrap-or (get options :bottom?) false
+                bottom? $ match (get options :bottom?)
+                  (:some value)
+                    if (bool? value) value false
+                  (:none) false
               keyed->
                 {} $ :style $ if bottom?
                   {} (:position :fixed) (:bottom 0) (:right 0)
@@ -282,12 +288,12 @@
             quote $ respo-message.comp.messages/comp-messages ({})
               {} $ :bottom? false
               fn (info d!) &unit
-          :schema $ quote $ Fn (Map String Dynamic) (Map Dynamic Dynamic)
+          :schema $ quote $ Fn (Map String Entry) (Map Dynamic OptionValue)
             Fn (Map Tag Dynamic)
               Fn *dispatch-op $ -> Unit
               -> R
             -> respo.schema/Component
-            :generics R
+            :generics Entry OptionValue R
         'message-entries $ %{} 'CodeEntry (:doc "|去重并校验消息条目为 map。")
           :code $ quote $ defn message-entries (messages)
             foldl

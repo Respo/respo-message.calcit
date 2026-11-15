@@ -24,6 +24,21 @@ try {
     assert.match(make_string(component), /notification/);
   }
   console.log('Generated JavaScript renders messages with missing, numeric, and legacy invalid timestamps.');
+  const positioningMessage = c._$n__$M_(t.id, 'position', t.text, 'position', t.time, 0);
+  const positioningMessages = c._$n__$M_('position', positioningMessage);
+  for (const [options, bottom] of [
+    [c._$n__$M_(), false],
+    [c._$n__$M_(t['bottom?'], true), true],
+    [c._$n__$M_(t['bottom?'], false), false],
+    [c._$n__$M_(t['bottom?'], null), false],
+    [c._$n__$M_(t['bottom?'], 1), false],
+  ]) {
+    const html = make_string(comp_messages(positioningMessages, options, () => null));
+    assert.match(html, bottom ? /bottom:0/ : /top:0/);
+    const item = make_string(comp_message(0, positioningMessage, options, () => null));
+    assert.match(item, bottom ? /bottom:8px/ : /top:8px/);
+  }
+  console.log('Message positioning only uses the bottom layout for true.');
   for (const token of ['nil', 'false']) {
     const messages = c.parse_cirru_edn(`{} (:a $ {} (:id :a) (:token ${token})) (:b $ {} (:id :b) (:token ${token}))`);
     const data = c.parse_cirru_edn(`{} (:id :a) (:token ${token})`);
