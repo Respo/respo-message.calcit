@@ -10,6 +10,7 @@ const scratch = await mkdtemp(resolve('.calcit/message-render-'));
 try {
   const output = join(scratch, 'js-out');
   run('calcit.cirru', '--emit-path', output, 'js');
+  run('calcit.cirru', '--reload-fn', 'respo.render.html/make-string', '--emit-path', output, 'js');
   const load = name => import(pathToFileURL(join(output, `${name}.mjs`)).href);
   const c = await load('calcit.core');
   const { comp_message, message_style_of } = await load('respo-message.comp.message');

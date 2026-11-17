@@ -477,10 +477,11 @@
           :examples $ []
           :schema $ quote $ Fn
             Fn (JsNullish respo.dom/DomElement) respo.schema/Component
-              Fn schema/Op $ -> Unit
+              Fn schema/Op (-> Unit) (:features :io :state)
               -> Unit
+              :features :io :js-ffi :state
             -> Unit
-            :features :io :state
+            :features :io :js-ffi :state
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.main
           :require
