@@ -5,9 +5,10 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
-### 0.4.2 / Calcit 0.43.0
+### 0.4.3 / Calcit 0.43.0
 
 升级源码后请配对正式 Calcit CLI 与 `@calcit/procs` 0.43.0，再生成 JS。
+依赖对齐 Respo 0.19.11、UI 0.15.5 与 Router 0.12.9，修复浏览器缺少 `process` 时的启动白屏。
 Demo 使用具名 `Op` 分派创建、移除和清空，状态更新使用 Respo `CoordKey` 路径。
 库的 `update-messages` 调用形状、消息 Map 和旧数据兼容性沿用原约定。
 
