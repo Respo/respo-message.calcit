@@ -477,7 +477,7 @@
           :examples $ []
           :schema $ quote $ Fn
             Fn (JsNullish respo.dom/DomElement) respo.schema/Component
-              Fn respo-message.schema/Op (-> Unit) (:features :io :state)
+              Fn schema/Op (-> Unit) (:features :io :state)
               -> Unit
               :features :io :js-ffi :state
             -> Unit
