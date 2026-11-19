@@ -367,7 +367,7 @@
         '*store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *store schema/store
           :examples $ []
-          :schema $ quote $ Ref (Map Dynamic Dynamic)
+          :schema $ quote $ Ref (Map Tag Dynamic)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ println |Dispatch: op
@@ -402,7 +402,7 @@
                 store @*store
                 apply-action $ fn (action payload)
                   hint-fn $ Fn Tag (Map Tag Dynamic)
-                    -> $ Map Dynamic Dynamic
+                    -> $ Map Tag Dynamic
                   let
                       messages $ decode-map-as
                         match (get store :messages)
@@ -417,11 +417,11 @@
                 (:message/clear)
                   apply-action action/clear $ {}
                 (:states cursor state)
-                  decode-map-as (update-states store cursor state) (Map Dynamic Dynamic)
+                  decode-map-as (update-states store cursor state) (Map Tag Dynamic)
                 _ $ do (eprintln "|Unhandled operation:" op) store
           :examples $ []
           :schema $ quote $ Fn schema/Op String Number
-            -> $ Map Dynamic Dynamic
+            -> $ Map Tag Dynamic
             :features :io :js-ffi :state
           :tests $ []
             %{} 'TestEntry (:name |clear-without-payload)
