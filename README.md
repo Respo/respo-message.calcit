@@ -5,6 +5,10 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
+### 0.4.5 / 正式依赖对齐
+
+配对 Calcit 0.44.0、Respo 0.19.13、UI 0.15.7、Router 0.12.11 与 JS-FFI 0.2.19 后重新安装并生成 JS；消息接口和行为保持不变。
+
 ### 0.4.4 / Calcit 0.44.0
 
 升级源码后请配对正式 Calcit CLI 与 `@calcit/procs` 0.44.0，再生成 JS。
