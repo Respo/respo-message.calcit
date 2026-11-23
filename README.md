@@ -5,6 +5,10 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
+### 0.4.6 / 正式依赖对齐
+
+配对 Calcit 0.44.0、Respo 0.19.15、UI 0.16.2、Router 0.12.14 与 JS-FFI 0.2.22 后重新安装并生成 JS；消息接口和行为保持不变，正式 tag 发布前为候选。
+
 ### 0.4.5 / 正式依赖对齐
 
 配对 Calcit 0.44.0、Respo 0.19.13、UI 0.15.7、Router 0.12.11 与 JS-FFI 0.2.19 后重新安装并生成 JS；消息接口和行为保持不变。
