@@ -46,7 +46,7 @@ try {
     const remaining = update_messages(messages, remove_one, data, 'op', 0);
     assert.deepEqual(c.to_js_data(remaining), { b: { id: 'b', token: token === 'nil' ? null : false } });
   }
-  for (const id of ['nil', 'false']) {
+  for (const id of ['nil', 'false', '0', '|']) {
     const messages = c.parse_cirru_edn(`{} (:a $ {} (:id ${id}) (:text |notification) (:time 0))`);
     assert.match(make_string(comp_messages(messages, c._$n__$M_(), () => null)), /notification/);
   }

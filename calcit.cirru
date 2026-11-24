@@ -278,7 +278,10 @@
                     hint-fn $ Fn Number (Map Dynamic Dynamic) (-> respo.schema/ChildPair)
                     keyed-component
                       read-coord-key $ match (get message :id)
-                        (:some id) (if id id |)
+                        (:some id)
+                          if
+                            or (nil? id) (= false id)
+                            , | id
                         (:none) |
                       comp-message idx message options on-remove!
           :examples $ []
@@ -554,7 +557,9 @@
                     data $ if (map? op-data) op-data $ raise "|respo-message expected a removal payload map"
                     token $ match (get data :token)
                       (:some value)
-                        if value (Some value) None
+                        if
+                          or (nil? value) (= false value)
+                          , None $ Some value
                       (:none) None
                     message-id $ get data :id
                   match token
@@ -570,7 +575,10 @@
                     (:none)
                       match message-id
                         (:some id)
-                          if id (.dissoc messages id) (.dissoc messages nil)
+                          if
+                            or (nil? id) (= false id)
+                            .dissoc messages nil
+                            .dissoc messages id
                         (:none) (.dissoc messages nil)
               true messages
           :examples $ []
