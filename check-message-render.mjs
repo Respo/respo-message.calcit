@@ -16,7 +16,11 @@ try {
   const { comp_message, message_style_of } = await load('respo-message.comp.message');
   const { comp_messages } = await load('respo-message.comp.messages');
   const { update_messages } = await load('respo-message.updater');
-  const { remove_one } = await load('respo-message.action');
+  const { clear, create, remove_one, message_action_$q_ } = await load('respo-message.action');
+  for (const action of [clear, create, remove_one]) assert.equal(message_action_$q_(action), true);
+  for (const other of [c.init_tags(['unknown-action'])['unknown-action'], null, false, 'message/create']) {
+    assert.equal(message_action_$q_(other), false);
+  }
   const { make_string } = await load('respo.render.html');
   const t = c.init_tags(['text', 'time', 'id', 'bottom?']);
   for (const time of [null, 42, 'legacy-invalid-time']) {
