@@ -40,7 +40,8 @@
         'message-action? $ %{} 'CodeEntry
           :doc "|Predicate function to check if an operation is a message action. Returns true for create, clear, and remove-one actions."
           :code $ quote $ defn message-action? (op)
-            includes? (#{} clear create remove-one) op
+            and (tag? op)
+              includes? (#{} clear create remove-one) op
           :examples $ []
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/create
             quote $ assert= false $ respo-message.action/message-action? :unknown-action
