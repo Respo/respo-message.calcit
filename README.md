@@ -5,6 +5,10 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
+### 0.4.9（候选）
+
+配套 Calcit / `@calcit/procs` 0.45.0、Respo 0.19.17 与 UI 0.16.4，更新后重新安装依赖并生成 JS。消息格式和删除规则保持 0.4.8 的行为，正式标签发布后再升级。
+
 ### 0.4.8（候选）
 
 消息 ID 和删除条件显式区分 `nil`、`false` 与其他值，保留现有行为，并为后续 Calcit 0.45 迁移做好准备。本版仍配对 Calcit / `@calcit/procs` 0.44.0；正式标签发布后再升级。
