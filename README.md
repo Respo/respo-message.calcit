@@ -7,7 +7,7 @@ Demo http://repo.respo-mvc.org/message.calcit/
 
 ### 0.4.11（候选）
 
-配套 Calcit / `@calcit/procs` 0.45.1、Respo 0.19.18、UI 0.16.5 和 JS-FFI 0.2.24；公开接口与消息行为保持，正式标签发布后重新安装依赖并生成 JS。
+配套 Calcit / `@calcit/procs` 0.45.1、Respo 0.19.18、UI 0.16.5、JS-FFI 0.2.24 和传递依赖 Router 0.12.17；公开接口与消息行为保持，正式标签发布后重新安装依赖并生成 JS。
 
 ### 0.4.10（候选）
 
