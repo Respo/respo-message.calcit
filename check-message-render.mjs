@@ -11,6 +11,7 @@ try {
   const output = join(scratch, 'js-out');
   run('calcit.cirru', '--emit-path', output, 'js');
   run('calcit.cirru', '--reload-fn', 'respo.render.html/make-string', '--emit-path', output, 'js');
+  process.env.release = 'true';
   const load = name => import(pathToFileURL(join(output, `${name}.mjs`)).href);
   const c = await load('calcit.core');
   const { comp_message, message_style_of } = await load('respo-message.comp.message');
@@ -22,6 +23,8 @@ try {
     assert.equal(message_action_$q_(other), false);
   }
   const { make_string } = await load('respo.render.html');
+  const { comp_container } = await load('respo-message.comp.container');
+  assert.match(make_string(comp_container(c._$n__$M_())), /Try/);
   const t = c.init_tags(['text', 'time', 'id', 'bottom?']);
   for (const time of [null, 42, 'legacy-invalid-time']) {
     const message = c._$n__$M_(t.id, 'm1', t.text, 'notification', t.time, time);
