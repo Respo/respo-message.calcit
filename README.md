@@ -5,6 +5,10 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
+### 0.4.11（候选）
+
+配套 Calcit / `@calcit/procs` 0.45.1、Respo 0.19.18、UI 0.16.5 和 JS-FFI 0.2.24；公开接口与消息行为保持，正式标签发布后重新安装依赖并生成 JS。
+
 ### 0.4.10（候选）
 
 配套 Calcit / `@calcit/procs` 0.45.1；消息操作识别继续接受任意输入，非消息操作仍返回 false。正式标签发布后重新安装依赖并生成 JS。
