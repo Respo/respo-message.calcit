@@ -107,7 +107,9 @@
                   {} $ :bottom? false
                   fn (info d!)
                     d! $ schema/Op :message/remove-one info
-                nil->option $ when config/dev? $ comp-inspect |messages messages ({})
+                if config/dev?
+                  Some $ comp-inspect |messages messages $ {}
+                  , None
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic Dynamic) (-> respo.schema/Component) (:features :js-ffi :state)
       :ns $ %{} 'NsEntry (:doc |)
