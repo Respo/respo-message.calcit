@@ -29,7 +29,7 @@
           :code $ quote $ def dict
             {} (:create create) (:remove-one remove-one) (:clear clear)
           :examples $ []
-            quote $ assert= true $ option:some? (get respo-message.action/dict :create)
+            quote $ assert= true $ .some? (get respo-message.action/dict :create)
             quote $ assert= 3 $ count respo-message.action/dict
           :schema $ quote $ Map Tag Tag
         'gen-tag $ %{} 'CodeEntry (:doc |)
@@ -40,8 +40,10 @@
         'message-action? $ %{} 'CodeEntry
           :doc "|Predicate function to check if an operation is a message action. Returns true for create, clear, and remove-one actions."
           :code $ quote $ defn message-action? (op)
-            and (tag? op)
-              includes? (#{} clear create remove-one) op
+            match (try-decode-map-as op Tag)
+              (:ok tag-op)
+                includes? (#{} clear create remove-one) tag-op
+              (:err _) false
           :examples $ []
             quote $ assert= true $ respo-message.action/message-action? respo-message.action/create
             quote $ assert= false $ respo-message.action/message-action? :unknown-action
@@ -70,12 +72,13 @@
         %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-container (store)
             let
-                messages $ decode-map-as
-                  match (get store :messages)
-                    (:some value)
-                      either value $ {}
-                    (:none) ({})
-                  Map String Dynamic
+                messages $ match (get store :messages)
+                  (:some value)
+                    match (nil->option value)
+                      (:some present)
+                        decode-map-as present $ Map String Dynamic
+                      (:none) ({})
+                  (:none) ({})
               div
                 {}
                   :class-name $ str-spaced css/global css/fullscreen
@@ -134,7 +137,9 @@
             let
                 bottom? $ match (get options :bottom?)
                   (:some value)
-                    if (bool? value) value false
+                    match (try-decode-map-as value Bool)
+                      (:ok b) b
+                      (:err _) false
                   (:none) false
                 message-style $ message-style-of message
                 message-timestamp $ message-time message
@@ -190,9 +195,7 @@
         'effect-fade $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defeffect effect-fade (message idx bottom?) (action el *local)
             let
-                dy $ if
-                  if (bool? bottom?) bottom? false
-                  , 0 $ if (number? idx) (* idx 40) 0
+                dy $ if bottom? 0 $ * idx 40
               match action
                 :mount $ let
                     element $ browser/element-host el
@@ -225,8 +228,10 @@
           :code $ quote $ defn message-style-of (message)
             match (get message :style)
               (:some style)
-                if (nil? style) ({})
-                  decode-map-as style $ Map Tag respo-ui.schema/InlineStyleValue
+                match (nil->option style)
+                  (:some present)
+                    decode-map-as present $ Map Tag respo-ui.schema/InlineStyleValue
+                  (:none) ({})
               (:none) ({})
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic MessageValue)
@@ -246,21 +251,47 @@
           :code $ quote $ defn message-text-of (message)
             match (get message :text)
               (:some text)
-                if (string? text) text $ if (nil? text) | $ str text
+                match (nil->option text)
+                  (:some present)
+                    match (try-decode-map-as present String)
+                      (:ok s) s
+                      (:err _) (str present)
+                  (:none) |
               (:none) |
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic MessageValue) (-> String) (:generics MessageValue)
+          :tests $ [] $ %{} 'TestEntry (:name |normalizes-text-values)
+            :code $ quote $ do
+              assert= |hello $ message-text-of $ {} (:text |hello)
+              assert= | $ message-text-of $ {} (:text nil)
+              assert= | $ message-text-of $ {}
+              assert= |42 $ message-text-of $ {} (:text 42)
+            :tags $ #{} :unit
         'with-present $ %{} 'CodeEntry
           :doc "|Add k when the value is present and not nil; otherwise keep the map, so a removal payload only carries the fields the message has."
           :code $ quote $ defn with-present (m k value-option)
             match value-option
               (:some value)
-                if (nil? value) m $ assoc m k value
+                match (nil->option value)
+                  (:some present) (assoc m k present)
+                  (:none) m
               (:none) m
           :examples $ []
           :schema $ quote $ Fn (Map Tag V) Tag (Option V)
             -> $ Map Tag V
             :generics V
+          :tests $ [] $ %{} 'TestEntry (:name |skips-none-and-nil-values)
+            :code $ quote $ let
+                base $ decode-map-as
+                  {} $ :a 1
+                  Map Tag Dynamic
+              assert= base $ with-present base :id None
+              assert= base $ with-present base :id $ Some nil
+              assert= (assoc base :id 0)
+                with-present base :id $ Some 0
+              assert= (assoc base :id false)
+                with-present base :id $ Some false
+            :tags $ #{} :unit
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.message
           :require
@@ -279,7 +310,9 @@
             let
                 bottom? $ match (get options :bottom?)
                   (:some value)
-                    if (bool? value) value false
+                    match (try-decode-map-as value Bool)
+                      (:ok b) b
+                      (:err _) false
                   (:none) false
               keyed->
                 {} $ :style $ if bottom?
@@ -294,10 +327,12 @@
                     keyed-component
                       read-coord-key $ match (get message :id)
                         (:some id)
-                          if
-                            or (nil? id)
-                              if (bool? id) (not id) false
-                            , | id
+                          match (nil->option id)
+                            (:some present)
+                              match (try-decode-map-as present Bool)
+                                (:ok b) (if b present |)
+                                (:err _) present
+                            (:none) |
                         (:none) |
                       comp-message idx message options on-remove!
           :examples $ []
@@ -323,8 +358,11 @@
                   List $ Map Dynamic Dynamic
                   , Entry $ ->
                     List $ Map Dynamic Dynamic
-                if (map? message) (.append acc message)
-                  raise $ str "|respo-message expected each message as a map, got: " $ type-of message
+                match
+                  try-decode-map-as message $ Map Dynamic Dynamic
+                  (:ok decoded) (.append acc decoded)
+                  (:err reason)
+                    raise $ str "|respo-message expected each message as a map: " reason
           :examples $ []
           :schema $ quote $ Fn (Map String Entry)
             -> $ List $ Map Dynamic Dynamic
@@ -340,10 +378,19 @@
           :code $ quote $ defn message-time (message)
             match (get message :time)
               (:some t)
-                if (number? t) t 0
+                match (try-decode-map-as t Number)
+                  (:ok n) n
+                  (:err _) 0
               (:none) 0
           :examples $ []
           :schema $ quote $ Fn (Map Dynamic MessageValue) (-> Number) (:generics MessageValue)
+          :tests $ [] $ %{} 'TestEntry (:name |defaults-non-numeric-time-to-zero)
+            :code $ quote $ do
+              assert= 42 $ message-time $ {} (:time 42)
+              assert= 0 $ message-time $ {} (:time nil)
+              assert= 0 $ message-time $ {} (:time |bad)
+              assert= 0 $ message-time $ {}
+            :tags $ #{} :unit
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-message.comp.messages
           :require
@@ -430,12 +477,13 @@
                   hint-fn $ Fn Tag (Map Tag Dynamic)
                     -> $ Map Tag Dynamic
                   let
-                      messages $ decode-map-as
-                        match (get store :messages)
-                          (:some value)
-                            either value $ {}
-                          (:none) ({})
-                        Map Dynamic Dynamic
+                      messages $ match (get store :messages)
+                        (:some value)
+                          match (nil->option value)
+                            (:some present)
+                              decode-map-as present $ Map Dynamic Dynamic
+                            (:none) ({})
+                        (:none) ({})
                     .assoc store :messages $ update-messages messages action payload op-id op-time
               match op
                 (:message/create payload) (apply-action action/create payload)
@@ -577,33 +625,39 @@
                   {} (:id op-id) (:time op-time)
               (&= op action/remove-one)
                 let
-                    data $ if (map? op-data) op-data $ raise "|respo-message expected a removal payload map"
-                    token $ match (get data :token)
-                      (:some value)
-                        if
-                          or (nil? value)
-                            if (bool? value) (not value) false
-                          , None $ Some value
-                      (:none) None
-                    message-id $ get data :id
+                    data $ match
+                      try-decode-map-as op-data $ Map Dynamic Dynamic
+                      (:ok m) m
+                      (:err _) (raise "|respo-message expected a removal payload map")
+                    non-falsey-option $ fn (opt)
+                      match opt
+                        (:some value)
+                          match (nil->option value)
+                            (:some present)
+                              match (try-decode-map-as present Bool)
+                                (:ok b)
+                                  if b (Some present) None
+                                (:err _) (Some present)
+                            (:none) None
+                        (:none) None
+                    token $ non-falsey-option $ get data :token
+                    message-id $ non-falsey-option $ get data :id
                   match token
                     (:some token-value)
                       filter-map-kv messages $ fn (key message)
                         if
                           = (Some token-value)
                             get
-                              if (map? message) message $ raise "|respo-message expected each message as a map"
+                              match
+                                try-decode-map-as message $ Map Dynamic Dynamic
+                                (:ok m) m
+                                (:err _) (raise "|respo-message expected each message as a map")
                               , :token
                           MapEntryDecision :drop
                           MapEntryDecision :keep key message
                     (:none)
                       match message-id
-                        (:some id)
-                          if
-                            or (nil? id)
-                              if (bool? id) (not id) false
-                            .dissoc messages nil
-                            .dissoc messages id
+                        (:some id) (.dissoc messages id)
                         (:none) (.dissoc messages nil)
               true messages
           :examples $ []
