@@ -15,7 +15,7 @@ try {
   const load = name => import(pathToFileURL(join(output, `${name}.mjs`)).href);
   const c = await load('calcit.core');
   const { comp_message, message_style_of } = await load('respo-message.comp.message');
-  const { comp_messages } = await load('respo-message.comp.messages');
+  const { comp_messages, message_entries } = await load('respo-message.comp.messages');
   const { update_messages } = await load('respo-message.updater');
   const { clear, create, remove_one, message_action_$q_ } = await load('respo-message.action');
   for (const action of [clear, create, remove_one]) assert.equal(message_action_$q_(action), true);
@@ -26,6 +26,12 @@ try {
   const { comp_container } = await load('respo-message.comp.container');
   assert.match(make_string(comp_container(c._$n__$M_())), /Try/);
   const t = c.init_tags(['text', 'time', 'id', 'bottom?']);
+  const duplicateMessages = c._$n__$M_(
+    'first', c._$n__$M_(t.id, 'same', t.text, 'hello'),
+    'duplicate', c._$n__$M_(t.id, 'same', t.text, 'hello'),
+    'other', c._$n__$M_(t.id, 'other', t.text, 'world'),
+  );
+  assert.equal(c.count(message_entries(duplicateMessages)), 2);
   for (const time of [null, 42, 'legacy-invalid-time']) {
     const message = c._$n__$M_(t.id, 'm1', t.text, 'notification', t.time, time);
     const component = comp_message(0, message, c._$n__$M_(), () => null);
