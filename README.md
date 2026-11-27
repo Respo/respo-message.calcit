@@ -5,6 +5,10 @@
 
 Demo http://repo.respo-mvc.org/message.calcit/
 
+### 0.4.13（候选）
+
+配套 Calcit / `@calcit/procs` 0.47.0、Respo 0.20.1、UI 0.16.7 和 JS-FFI 0.2.26；移除旧 `either` / `nil` 兼容写法并改用 `Option<T>`、`nil->option` 与 `try-decode-map-as`，消除 `W_RUNTIME_TYPE_PREDICATE` 迁移告警，公开消息接口与去重、排序、删除语义保持兼容。正式标签发布后重新安装依赖并生成 JS。
+
 ### 0.4.12（候选）
 
 配套 Calcit / `@calcit/procs` 0.46.0、Respo 0.20.0、UI 0.16.6 和 JS-FFI 0.2.26；消息去重及旧值处理保持兼容。正式标签发布后重新安装依赖并生成 JS。
