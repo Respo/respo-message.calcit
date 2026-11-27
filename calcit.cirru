@@ -190,7 +190,9 @@
         'effect-fade $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defeffect effect-fade (message idx bottom?) (action el *local)
             let
-                dy $ if (= true bottom?) 0 $ if (number? idx) (* idx 40) 0
+                dy $ if
+                  if (bool? bottom?) bottom? false
+                  , 0 $ if (number? idx) (* idx 40) 0
               match action
                 :mount $ let
                     element $ browser/element-host el
@@ -293,7 +295,8 @@
                       read-coord-key $ match (get message :id)
                         (:some id)
                           if
-                            or (nil? id) (= false id)
+                            or (nil? id)
+                              if (bool? id) (not id) false
                             , | id
                         (:none) |
                       comp-message idx message options on-remove!
@@ -313,7 +316,7 @@
         'message-entries $ %{} 'CodeEntry (:doc "|去重并校验消息条目为 map。")
           :code $ quote $ defn message-entries (messages)
             foldl
-              .to-list $ .distinct-values messages
+              .to-list $ foldl (&map:vals messages) (#{}) &include
               []
               defn %message-entry (acc message)
                 hint-fn $ Fn
@@ -326,6 +329,13 @@
           :schema $ quote $ Fn (Map String Entry)
             -> $ List $ Map Dynamic Dynamic
             :generics Entry
+          :tests $ [] $ %{} 'TestEntry (:name |deduplicates-equal-messages)
+            :code $ quote $ assert= 2
+              .len $ message-entries $ {}
+                |first $ {} (:id 1) (:text |same)
+                |duplicate $ {} (:id 1) (:text |same)
+                |other $ {} (:id 2) (:text |other)
+            :tags $ #{} :unit
         'message-time $ %{} 'CodeEntry (:doc "|读取消息时间用于排序，缺失或非数字时为 0。")
           :code $ quote $ defn message-time (message)
             match (get message :time)
@@ -571,7 +581,8 @@
                     token $ match (get data :token)
                       (:some value)
                         if
-                          or (nil? value) (= false value)
+                          or (nil? value)
+                            if (bool? value) (not value) false
                           , None $ Some value
                       (:none) None
                     message-id $ get data :id
@@ -589,7 +600,8 @@
                       match message-id
                         (:some id)
                           if
-                            or (nil? id) (= false id)
+                            or (nil? id)
+                              if (bool? id) (not id) false
                             .dissoc messages nil
                             .dissoc messages id
                         (:none) (.dissoc messages nil)
